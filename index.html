@@ -41,12 +41,28 @@ html{scroll-behavior:smooth}
 body{margin:0;background:var(--cream);color:var(--navy);font:500 16px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 a{color:inherit}
 h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.02em}
-h2{font-size:clamp(30px,4.2vw,44px);line-height:1.05}
-.eyebrow{font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin-bottom:12px}
+h2{font-size:clamp(34px,5vw,58px);line-height:1.02}
+.hl{position:relative;display:inline-block;z-index:0}
+.hl::after{content:"";position:absolute;left:-2px;right:-2px;bottom:.08em;height:.32em;background:var(--coral);opacity:.45;z-index:-1;border-radius:4px;transform:rotate(-1deg)}
+.eyebrow{position:relative;display:inline-block;font-weight:800;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--navy);background:#fff;border:1.5px solid var(--navy);border-radius:7px;padding:7px 12px;margin-bottom:22px}
+.eyebrow::before,.eyebrow::after{content:"";position:absolute;bottom:-10px;width:2px;height:10px;background:var(--navy)}
+.eyebrow::before{left:10px}.eyebrow::after{right:10px}
+.dark .eyebrow{background:var(--navy);color:#fff;border-color:#fff}.dark .eyebrow::before,.dark .eyebrow::after{background:#fff}
 .lead{max-width:640px;color:#334155;font-size:17px}
 .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
 section{padding:84px 0}
 section+section{border-top:1px solid var(--line)}
+section.dark{background:var(--navy);color:#fff;position:relative;overflow:hidden;border-top:0;padding-bottom:180px}
+section.dark .lead{color:#CBD5E1}
+section.dark .empty{border-color:#334155;color:#94A3B8}section.dark .empty b{color:#fff}
+section.dark table{background:#0B1222;border-color:#334155;color:#fff}section.dark th{background:#111A2E;color:#94A3B8}section.dark td{border-color:#1E293B}
+#night{position:absolute;left:0;right:0;bottom:0;width:100%;height:170px;pointer-events:none}
+section.dark .clock{background:#fff;color:var(--navy)}
+section.dark .clock .t{color:var(--navy)}
+section.dark .clock .l{color:var(--mute)}
+section.dark .clock p{color:#334155}
+section.dark .clock .pb{background:#F1EEE6}
+section.dark .calc{border:1px solid #334155;background:#0B1222}
 
 /* nav — links only, centered, one row */
 nav{position:sticky;top:0;z-index:20;background:rgba(250,247,241,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
@@ -169,6 +185,7 @@ tr:last-child td{border-bottom:0}
 @media(max-width:520px){.steps{grid-template-columns:1fr}}
 .step{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px}
 .step .n{font-size:12px;font-weight:600;letter-spacing:.12em;color:var(--coral)}
+.step .ico{width:56px;height:56px;margin:12px 0 4px}.step .ico svg{width:100%;height:100%}
 .step h3{margin:8px 0 8px;font-size:20px}
 .step p{margin:0;color:#334155;font-size:14px}
 .rule{margin-top:40px;border-top:1px solid var(--line)}
@@ -181,6 +198,13 @@ tr:last-child td{border-bottom:0}
 .tile .l{font:600 12px/1 Inter;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
 .tile .v{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-top:8px;word-break:break-all}
 .tile .v small{font-size:14px;color:var(--mute);font-weight:600}
+.deed{position:relative;margin-top:32px;padding:28px;background:#FFFDF8;border:2px solid var(--navy);border-radius:6px;box-shadow:0 0 0 6px #FFFDF8,0 0 0 8px var(--navy),0 24px 50px rgba(15,23,42,.12)}
+.deedhead{display:flex;justify-content:space-between;font:800 12px/1 Inter;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);border-bottom:1.5px dashed var(--line);padding-bottom:12px}
+.deedtitle{font:800 22px/1.2 Inter;letter-spacing:-.02em;margin-top:16px}
+.deed .tiles{margin-top:20px}
+.deed .tile{background:transparent;border:1.5px solid var(--line);border-radius:10px}
+.stamp{position:absolute;top:58px;right:26px;width:92px;height:92px;border-radius:50%;border:3px solid var(--coral);color:var(--coral);font:800 13px/1.15 Inter;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;text-align:center;transform:rotate(-14deg);opacity:.9;box-shadow:inset 0 0 0 3px #FFFDF8,inset 0 0 0 5px var(--coral)}
+@media(max-width:640px){.stamp{width:72px;height:72px;font-size:10px;top:60px}}
 .ca{display:flex;gap:10px;align-items:center;margin-top:24px;padding:14px 16px;background:#fff;border:1.5px solid var(--navy);border-radius:14px;font:600 14px/1.4 Inter;word-break:break-all}
 .ca button{white-space:nowrap}
 .rv{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
@@ -223,7 +247,7 @@ footer .fl a{font-weight:600;text-decoration:none;color:var(--navy)}
     <h1 class="word">rent</h1>
     <p class="tag">Rent is due every hour.</p>
     <div class="btns">
-      <a class="btn fill" href="#list">List a property</a>
+      <a class="btn coral" href="#list">List a property</a>
       <a class="btn" id="heroTrade" href="#token">Buy $RENT</a>
       <a class="btn" id="heroX" href="#" target="_blank" rel="noopener">X ↗</a>
     </div>
@@ -237,7 +261,7 @@ footer .fl a{font-weight:600;text-decoration:none;color:var(--navy)}
 <section id="street-s">
   <div class="wrap">
     <div class="eyebrow">the street</div>
-    <h2>Every coin is a property.</h2>
+    <h2>Every coin is a <span class="hl">property</span>.</h2>
     <p class="lead">Each one is paired to a stock and pays its landlords every hour. The numbers below are read live from Blockscout and Dexscreener — cap rate, rent per hour, tenants — never typed in.</p>
     <div class="chips" id="sort">
       <button data-k="cap" class="on">cap rate</button>
@@ -255,7 +279,7 @@ footer .fl a{font-weight:600;text-decoration:none;color:var(--navy)}
 <section id="list">
   <div class="wrap">
     <div class="eyebrow">list a property</div>
-    <h2>Become a landlord.</h2>
+    <h2>Become a <span class="hl">landlord</span>.</h2>
     <p class="lead">Name it, pick the stock it pays in, and set the rent wallet. The description below goes into the Pons launch form; the rent wallet goes in as the creator fee recipient. Every trade pays 1% rent — 0.7% reaches the landlords every hour, in the stock.</p>
     <div class="two">
       <form class="form" id="listForm" autocomplete="off">
@@ -289,10 +313,10 @@ footer .fl a{font-weight:600;text-decoration:none;color:var(--navy)}
   </div>
 </section>
 
-<section id="roll">
+<section id="roll" class="dark">
   <div class="wrap">
     <div class="eyebrow">rent roll</div>
-    <h2>Every hour, the rent is collected.</h2>
+    <h2>Every hour, the <span class="hl">rent</span> is collected.</h2>
     <p class="lead">Fees → $USDG → buy the stock → sent to the landlords' wallets. Every collection is logged here with its transaction.</p>
     <div class="clock">
       <div><div class="l"><i></i>next collection in</div><div class="t" id="clock">--:--</div></div>
@@ -303,7 +327,7 @@ footer .fl a{font-weight:600;text-decoration:none;color:var(--navy)}
 
     <div class="calc">
       <div>
-        <div class="eyebrow" style="color:#94A3B8">cap-rate calculator</div>
+        <div class="eyebrow">cap-rate calculator</div>
         <div class="form">
           <label>Market cap ($)<input id="cMcap" type="number" inputmode="decimal" value="200000" min="0"></label>
           <label>24h volume ($)<input id="cVol" type="number" inputmode="decimal" value="50000" min="0"></label>
@@ -319,17 +343,18 @@ footer .fl a{font-weight:600;text-decoration:none;color:var(--navy)}
       </div>
     </div>
   </div>
+  <canvas id="night" aria-hidden="true"></canvas>
 </section>
 
 <section id="how">
   <div class="wrap">
     <div class="eyebrow">how it works</div>
-    <h2>Traders pay. Landlords collect.</h2>
+    <h2>Traders pay. Landlords <span class="hl">collect</span>.</h2>
     <div class="steps">
-      <div class="step"><div class="n">01</div><h3>List</h3><p>Name a property, pick the stock it pays in, set the rent wallet. Launch it on Pons with the RENT description.</p></div>
-      <div class="step"><div class="n">02</div><h3>Rent</h3><p>Every trade on the property pays 1% rent. 0.7% goes to the rent wallet, 0.3% to Pons. Curve fees before graduation, pool fees after.</p></div>
-      <div class="step"><div class="n">03</div><h3>Collect</h3><p>Every hour the rent wallet swaps what it holds to $USDG, buys the stock, and sends it to every holder's wallet, pro rata.</p></div>
-      <div class="step"><div class="n">04</div><h3>Cap rate</h3><p>Each property is priced like real estate: 24h rent ÷ market cap, annualized. Read from the chain, never typed in.</p></div>
+      <div class="step"><div class="n">01</div><div class="ico"><svg viewBox="0 0 48 48"><rect x="6" y="10" width="36" height="20" rx="4" fill="#FAF7F1" stroke="#0F172A" stroke-width="2.5"/><rect x="12" y="30" width="2.5" height="12" fill="#0F172A"/><rect x="33.5" y="30" width="2.5" height="12" fill="#0F172A"/><rect x="13" y="17" width="22" height="3" rx="1.5" fill="#0F172A"/><rect x="13" y="23" width="12" height="3" rx="1.5" fill="#FF7A59"/></svg></div><h3>List</h3><p>Name a property, pick the stock it pays in, set the rent wallet. Launch it on Pons with the RENT description.</p></div>
+      <div class="step"><div class="n">02</div><div class="ico"><svg viewBox="0 0 48 48"><ellipse cx="24" cy="34" rx="15" ry="6" fill="#0F172A"/><ellipse cx="24" cy="28" rx="15" ry="6" fill="#FAF7F1" stroke="#0F172A" stroke-width="2.5"/><ellipse cx="24" cy="22" rx="15" ry="6" fill="#FAF7F1" stroke="#0F172A" stroke-width="2.5"/><ellipse cx="24" cy="16" rx="15" ry="6" fill="#FF7A59" stroke="#0F172A" stroke-width="2.5"/><text x="24" y="19" text-anchor="middle" font-family="Inter,system-ui" font-weight="800" font-size="8" fill="#0F172A">1%</text></svg></div><h3>Rent</h3><p>Every trade on the property pays 1% rent. 0.7% goes to the rent wallet, 0.3% to Pons. Curve fees before graduation, pool fees after.</p></div>
+      <div class="step"><div class="n">03</div><div class="ico"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="#FAF7F1" stroke="#0F172A" stroke-width="2.5"/><path d="M24 12v12l8 5" stroke="#0F172A" stroke-width="3" stroke-linecap="round" fill="none"/><circle cx="24" cy="24" r="2.5" fill="#FF7A59"/></svg></div><h3>Collect</h3><p>Every hour the rent wallet swaps what it holds to $USDG, buys the stock, and sends it to every holder's wallet, pro rata.</p></div>
+      <div class="step"><div class="n">04</div><div class="ico"><svg viewBox="0 0 48 48"><path d="M8 38h32" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round"/><rect x="11" y="24" width="7" height="14" rx="2" fill="#0F172A"/><rect x="21" y="16" width="7" height="22" rx="2" fill="#0F172A"/><rect x="31" y="8" width="7" height="30" rx="2" fill="#FF7A59"/></svg></div><h3>Cap rate</h3><p>Each property is priced like real estate: 24h rent ÷ market cap, annualized. Read from the chain, never typed in.</p></div>
     </div>
     <div class="flow" aria-label="how the rent flows">
       <svg viewBox="0 0 1000 120" xmlns="http://www.w3.org/2000/svg">
@@ -349,8 +374,12 @@ footer .fl a{font-weight:600;text-decoration:none;color:var(--navy)}
 <section id="token">
   <div class="wrap">
     <div class="eyebrow">the token</div>
-    <h2>$RENT is the first property.</h2>
+    <h2>$RENT is the <span class="hl">first</span> property.</h2>
     <p class="lead">The pad's own coin, listed the same way as every other property. It pays in $<span id="tokStock">NVDA</span>. Its numbers below come from the same reader as the street.</p>
+    <div class="deed">
+      <div class="deedhead"><span>property deed</span><span>no. 0001</span></div>
+      <div class="deedtitle">$RENT · the pad's own property</div>
+      <div class="stamp">paid<br>hourly</div>
     <div class="tiles">
       <div class="tile"><div class="l">pays in</div><div class="v">$<span id="tStock">NVDA</span></div></div>
       <div class="tile"><div class="l">rent</div><div class="v">1% <small>per trade</small></div></div>
@@ -362,6 +391,7 @@ footer .fl a{font-weight:600;text-decoration:none;color:var(--navy)}
       <div class="tile"><div class="l">rent / hr</div><div class="v" id="tRent">—</div></div>
     </div>
     <div class="ca" id="caRow" hidden><span>CA</span><span id="caText"></span><button class="btn" type="button" id="copyCa">Copy</button></div>
+    </div>
     <div class="btns" id="tokLinks" style="margin-top:24px"></div>
     <p class="note" id="tokNote" style="text-align:center"></p>
   </div>
@@ -458,6 +488,29 @@ function drawStreet(stocks) {
     g.fillStyle = CREAM; g.strokeStyle = NAVY; g.lineWidth = 1.5; g.beginPath(); g.roundRect(px, py, pw, ph, 4); g.fill(); g.stroke();
     g.fillStyle = NAVY; g.fillText(t, sg.cx, py + 14); lastx = sg.cx; }
 }
+
+// night street under the rent roll (dark section) — windows lit, a few flicker
+let NIGHT = null;
+function drawNight() {
+  const c = $('#night'); if (!c) return; const dpr = Math.min(2, devicePixelRatio || 1);
+  const W = c.clientWidth, H = c.clientHeight; c.width = W * dpr; c.height = H * dpr;
+  const g = c.getContext('2d'); g.scale(dpr, dpr); g.clearRect(0, 0, W, H);
+  const r = rng(77); const wins = [];
+  g.fillStyle = '#1E293B';
+  for (let x = -20; x < W + 20;) { const bw = 40 + r() * 70, bh = H * (.35 + r() * .5); g.fillRect(x, H - bh, bw, bh); x += bw + 6 + r() * 14; }
+  const r2 = rng(78);
+  for (let x = -10; x < W + 10;) {
+    const bw = 44 + r2() * 70, bh = H * (.22 + r2() * .55), top = H - bh; const k = r2();
+    g.fillStyle = '#060B16'; g.fillRect(x, top, bw, bh);
+    if (k < .35) { g.beginPath(); g.moveTo(x - 4, top); g.lineTo(x + bw / 2, top - bw * .25); g.lineTo(x + bw + 4, top); g.fill(); } else if (k < .6) g.fillRect(x - 3, top - 5, bw + 6, 5); else { g.fillRect(x + bw * .2, top - 9, bw * .6, 9); g.fillRect(x + bw * .4, top - 16, bw * .2, 7); }
+    const cols = Math.max(1, Math.floor((bw - 10) / 18)), rows = Math.max(1, Math.floor((bh - 22) / 20)); const ox = x + (bw - (cols * 18 - 7)) / 2;
+    for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) { const wy = top + 9 + j * 20; if (wy + 12 > H - 6) continue; const on = r2() < .55; const col = on ? (r2() > .75 ? CORAL : '#FFE3A8') : '#0F172A'; g.fillStyle = col; g.fillRect(ox + i * 18, wy, 11, 12); wins.push({ x: ox + i * 18, y: wy, on }); }
+    x += bw + 5 + r2() * 16;
+  }
+  NIGHT = { g, wins };
+}
+setInterval(() => { if (!NIGHT) return; for (let k = 0; k < 3; k++) { const w = NIGHT.wins[Math.floor(Math.random() * NIGHT.wins.length)]; if (!w) continue; w.on = !w.on; NIGHT.g.fillStyle = w.on ? (Math.random() > .75 ? CORAL : '#FFE3A8') : '#0F172A'; NIGHT.g.fillRect(w.x, w.y, 11, 12); } }, 900);
+drawNight(); addEventListener('resize', drawNight);
 
 // ------------------------------------------------------------------ quotes tape
 async function loadTape() {

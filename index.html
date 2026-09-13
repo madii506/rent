@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rent</title>
+<meta name="description" content="Every coin is a property. Traders pay the rent. Holders are the landlords, paid every hour in the stock.">
+<meta property="og:title" content="Rent — every coin is a property">
+<meta property="og:description" content="Traders pay the rent. Holders are the landlords, paid every hour in the stock. Rent is due every hour.">
+<meta property="og:image" content="assets/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=1">
+<link rel="icon" type="image/png" sizes="64x64" href="assets/favicon-64.png?v=1">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png?v=1">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/favicon-512.png?v=1">
+<script>
+// ------------------------------------------------------------------
+// CONFIG — fill at launch. Rows that need a value render only when set.
+const CONFIG = {
+  ca: '',                 // $RENT contract address
+  x: 'https://x.com/',    // X account
+  pool: '',               // trade link (Pons coin page)
+  chart: '',              // Dexscreener link
+  launchpad: 'https://ponsvault.com/launch',
+  stock: 'NVDA',          // the stock $RENT pays in
+  landlord: '',           // the rent wallet (creatorFeeRecipient)
+};
+const STOCKS = ['NVDA','TSLA','AAPL','META','COIN','AMZN','MSFT','GOOGL','AMD','NFLX','SHOP','MSTR','SPCX','TSM','RBLX','SNAP','LULU','HIMS','COST','RDDT','UPS','F','BA','INTC','SNOW','NET','PFE','LLY','JNJ','IBM','BABA','NU','GLD','SLV','QQQ','SPY','GME','AMC','DJT','CRCL','SNDK','MRVL','MRNA','FIG','BB','WYFI','SKHY','BULL','INDA','SGOV','CEG','RCAT','QUBT'];
+const TAPE = ['NVDA','TSLA','AAPL','META','COIN','AMZN','MSFT','GOOGL'];
+</script>
+<style>
+@font-face{font-family:Inter;font-weight:500;src:url(assets/fonts/inter-500.woff2) format('woff2');font-display:swap}
+@font-face{font-family:Inter;font-weight:600;src:url(assets/fonts/inter-600.woff2) format('woff2');font-display:swap}
+@font-face{font-family:Inter;font-weight:800;src:url(assets/fonts/inter-800.woff2) format('woff2');font-display:swap}
+:root{--cream:#FAF7F1;--navy:#0F172A;--coral:#FF7A59;--peach:#FFBE96;--lilac:#DECDFF;--sky:#A0D6FF;--mute:#667085;--line:#E7E2D8;--card:#fff}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--navy);font:500 16px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(30px,4.2vw,44px);line-height:1.05}
+.eyebrow{font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin-bottom:12px}
+.lead{max-width:640px;color:#334155;font-size:17px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+section{padding:84px 0}
+section+section{border-top:1px solid var(--line)}
+
+/* nav — links only, centered, one row */
+nav{position:sticky;top:0;z-index:20;background:rgba(250,247,241,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+nav ul{list-style:none;margin:0;padding:0;display:flex;justify-content:center;gap:6px;flex-wrap:nowrap;overflow-x:auto}
+nav a,nav button{display:block;padding:14px 14px;font:600 13px/1 Inter;letter-spacing:.06em;text-transform:lowercase;color:var(--navy);text-decoration:none;background:none;border:0;cursor:pointer;white-space:nowrap}
+nav a:hover,nav button:hover{color:var(--coral)}
+nav button.on{color:var(--coral)}
+
+/* hero */
+.hero{position:relative;overflow:hidden;background:
+ radial-gradient(60% 80% at 8% 30%,#FFBE96 0%,rgba(255,190,150,0) 60%),
+ radial-gradient(50% 70% at 50% 35%,#DECDFF 0%,rgba(222,205,255,0) 60%),
+ radial-gradient(60% 80% at 92% 30%,#A0D6FF 0%,rgba(160,214,255,0) 60%),#FAF7F1}
+.hero .wrap{position:relative;text-align:center;padding-top:96px;padding-bottom:0}
+.hero .word{font-size:clamp(84px,14vw,168px);line-height:.9;letter-spacing:-.05em;font-weight:800}
+.hero .tag{font-size:clamp(18px,2.4vw,26px);font-weight:600;margin:18px 0 28px}
+.btns{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 22px;border-radius:999px;font:600 15px/1 Inter;text-decoration:none;border:2px solid var(--navy);background:transparent;color:var(--navy);cursor:pointer;transition:transform .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn.fill{background:var(--navy);color:#fff}
+.btn.coral{background:var(--coral);border-color:var(--coral);color:#fff}
+.btn:disabled{opacity:.5;cursor:default}
+.keys{position:absolute;inset:0;pointer-events:none}
+.keys svg{position:absolute;top:0;width:min(9vw,110px);filter:drop-shadow(0 12px 14px rgba(15,23,42,.22));animation:sway 6s ease-in-out infinite;transform-origin:50% 0}
+.keys .k1{left:5%;height:auto}.keys .k2{left:13%;width:min(6.5vw,80px);animation-delay:-2s}.keys .k3{right:13%;width:min(6.5vw,80px);animation-delay:-4s}.keys .k4{right:5%;animation-delay:-1s}
+@keyframes sway{0%,100%{transform:rotate(3deg)}50%{transform:rotate(-3deg)}}
+#street{display:block;width:100%;height:220px;margin-top:40px}
+@media(max-width:720px){.keys .k2,.keys .k3{display:none}#street{height:150px}}
+
+/* tape */
+.tape{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#fff;overflow:hidden;white-space:nowrap}
+.tape .row{display:inline-block;padding:10px 0;animation:tape 40s linear infinite}
+.tape:hover .row{animation-play-state:paused}
+.tape .q{display:inline-flex;gap:8px;align-items:center;margin:0 18px;font:600 13px/1 Inter;letter-spacing:.02em}
+.tape .q .c{color:var(--mute);font-weight:500}.tape .q .up{color:#16a34a}.tape .q .dn{color:#dc2626}
+@keyframes tape{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin-top:32px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 10px 30px rgba(15,23,42,.06);transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(15,23,42,.10)}
+.card .sky{background:linear-gradient(120deg,#FFBE96,#DECDFF 50%,#A0D6FF);padding:18px 18px 0;height:170px;display:flex;align-items:flex-end;justify-content:center}
+.card .sky svg{width:100%;height:150px;display:block}
+.card .body{padding:18px}
+.card .name{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.card .name b{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:#FFF1EA;color:#9A3412;font:600 12px/1 Inter;letter-spacing:.02em;white-space:nowrap}
+.chip.navy{background:var(--navy);color:#fff}
+.chip.mute{background:#F1EEE6;color:var(--mute)}
+.cap{margin:14px 0 6px;display:flex;align-items:baseline;gap:10px}
+.cap b{font-size:38px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.cap span{color:var(--mute);font-size:13px;font-weight:600}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;margin:14px 0;font-size:13px}
+.stats div{display:flex;justify-content:space-between;border-bottom:1px dashed var(--line);padding:6px 0}
+.stats span{color:var(--mute)}.stats b{font-weight:600;font-variant-numeric:tabular-nums}
+.links{display:flex;gap:8px;flex-wrap:wrap}
+.links a,.links button{flex:1;text-align:center;padding:10px 12px;border-radius:12px;border:1.5px solid var(--navy);font:600 13px/1 Inter;text-decoration:none;background:#fff;color:var(--navy);cursor:pointer}
+.links a:hover,.links button:hover{background:var(--navy);color:#fff}
+.empty{margin-top:32px;padding:48px 24px;border:1.5px dashed var(--line);border-radius:20px;text-align:center;color:var(--mute)}
+.empty b{display:block;color:var(--navy);font-size:20px;margin-bottom:6px;font-weight:800}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.chips button{padding:8px 14px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font:600 13px/1 Inter;cursor:pointer;color:var(--navy)}
+.chips button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* forms */
+.two{display:grid;grid-template-columns:1.1fr .9fr;gap:32px;align-items:start;margin-top:32px}
+@media(max-width:860px){.two{grid-template-columns:1fr}}
+.form{display:grid;gap:14px}
+label{display:grid;gap:6px;font:600 12px/1 Inter;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+input,select,textarea{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;font:500 15px/1.4 Inter;color:var(--navy);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--navy)}
+textarea{min-height:120px;resize:vertical;font-size:14px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.note{font-size:13px;color:var(--mute);margin-top:10px}
+.note b{color:var(--navy)}
+.sticky{position:sticky;top:70px}
+.out{margin-top:14px;padding:16px;border-radius:14px;background:#fff;border:1px solid var(--line);font-size:14px}
+.out.ok{border-color:#16a34a}.out.bad{border-color:#dc2626}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
+.kv span{color:var(--mute)}.kv b{font-weight:600;font-variant-numeric:tabular-nums;word-break:break-all}
+
+/* tables / calculator */
+table{width:100%;border-collapse:collapse;margin-top:24px;font-size:14px;background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line)}
+th{font:600 12px/1 Inter;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);background:#FCFAF6}
+tr:last-child td{border-bottom:0}
+.calc{margin-top:32px;background:var(--navy);color:#fff;border-radius:22px;padding:28px;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:860px){.calc{grid-template-columns:1fr}}
+.calc label{color:#CBD5E1}.calc input{background:#1E293B;border-color:#334155;color:#fff}
+.calc .big{font-size:56px;font-weight:800;letter-spacing:-.04em;line-height:1;color:var(--coral)}
+.calc .res{display:grid;gap:10px;align-content:start}
+.calc .res div{display:flex;justify-content:space-between;border-bottom:1px solid #334155;padding:8px 0;font-size:14px}
+.calc .res span{color:#94A3B8}
+
+/* how */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:32px}
+@media(max-width:860px){.steps{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.steps{grid-template-columns:1fr}}
+.step{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px}
+.step .n{font-size:12px;font-weight:600;letter-spacing:.12em;color:var(--coral)}
+.step h3{margin:8px 0 8px;font-size:20px}
+.step p{margin:0;color:#334155;font-size:14px}
+.rule{margin-top:40px;border-top:1px solid var(--line)}
+.rule div{display:grid;grid-template-columns:56px 1fr;gap:16px;padding:18px 0;border-bottom:1px solid var(--line);font-size:17px}
+.rule div i{font-style:normal;font-weight:800;color:var(--coral)}
+
+/* token */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:32px}
+.tile{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px}
+.tile .l{font:600 12px/1 Inter;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.tile .v{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-top:8px;word-break:break-all}
+.tile .v small{font-size:14px;color:var(--mute);font-weight:600}
+.ca{display:flex;gap:10px;align-items:center;margin-top:24px;padding:14px 16px;background:#fff;border:1.5px solid var(--navy);border-radius:14px;font:600 14px/1.4 Inter;word-break:break-all}
+.ca button{white-space:nowrap}
+footer{padding:48px 0;text-align:center;color:var(--mute);font-size:13px}
+footer .k{width:36px;margin:0 auto 12px;display:block}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--navy);color:#fff;padding:12px 18px;border-radius:999px;font:600 13px/1 Inter;transition:.25s;pointer-events:none;z-index:50}
+.toast.show{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+
+<nav><ul>
+  <li><a href="#street">street</a></li>
+  <li><a href="#list">list</a></li>
+  <li><a href="#roll">rent roll</a></li>
+  <li><a href="#how">how</a></li>
+  <li><a href="#token">token</a></li>
+  <li><button id="snd" type="button" aria-pressed="false">snd</button></li>
+</ul></nav>
+
+<header class="hero">
+  <div class="keys" aria-hidden="true"></div>
+  <div class="wrap">
+    <h1 class="word">rent</h1>
+    <p class="tag">Rent is due every hour.</p>
+    <div class="btns">
+      <a class="btn fill" href="#list">List a property</a>
+      <a class="btn" id="heroTrade" href="#token">Buy $RENT</a>
+      <a class="btn" id="heroX" href="#" target="_blank" rel="noopener">X ↗</a>
+    </div>
+  </div>
+  <canvas id="street" aria-hidden="true"></canvas>
+</header>
+
+<div class="tape" id="tape"><div class="row" id="tapeRow"><span class="q"><span>loading quotes…</span></span></div></div>
+
+<section id="street-s">
+  <div class="wrap">
+    <div class="eyebrow">the street</div>
+    <h2>Every coin is a property.</h2>
+    <p class="lead">Each one is paired to a stock and pays its landlords every hour. The numbers below are read live from Blockscout and Dexscreener — cap rate, rent per hour, tenants — never typed in.</p>
+    <div class="chips" id="sort">
+      <button data-k="cap" class="on">cap rate</button>
+      <button data-k="rent">rent / hr</button>
+      <button data-k="tenants">tenants</button>
+      <button data-k="new">newest</button>
+      <button data-k="refresh" style="margin-left:auto">↻ refresh</button>
+    </div>
+    <div class="grid" id="board"></div>
+    <div class="empty" id="boardEmpty" hidden><b>No properties on the street yet.</b>The first one is listed at launch. It pays in $<span id="emptyStock">NVDA</span>.</div>
+  </div>
+</section>
+
+<section id="list">
+  <div class="wrap">
+    <div class="eyebrow">list a property</div>
+    <h2>Become a landlord.</h2>
+    <p class="lead">Name it, pick the stock it pays in, and set the rent wallet. The description below goes into the Pons launch form; the rent wallet goes in as the creator fee recipient. Every trade pays 1% rent — 0.7% reaches the landlords every hour, in the stock.</p>
+    <div class="two">
+      <form class="form" id="listForm" autocomplete="off">
+        <div class="row2">
+          <label>Property name<input id="fName" placeholder="Nvidia Tower" maxlength="32" required></label>
+          <label>Ticker<input id="fTicker" placeholder="TOWER" maxlength="10" required></label>
+        </div>
+        <div class="row2">
+          <label>Pays in<select id="fStock"></select></label>
+          <label>Rent wallet (creator fee recipient)<input id="fWallet" placeholder="0x…" maxlength="42"></label>
+        </div>
+        <label>Pons description (copy this into the launch form)<textarea id="fDesc" readonly></textarea></label>
+        <div class="btns" style="justify-content:flex-start">
+          <button class="btn fill" type="button" id="copyDesc">Copy description</button>
+          <a class="btn coral" id="openPons" href="https://ponsvault.com/launch" target="_blank" rel="noopener">Open Pons launch ↗</a>
+        </div>
+        <p class="note"><b>What happens next.</b> Launch it on Pons with that description and the rent wallet as the fee recipient, then register the address below. We verify the description on chain and add the property to the street by hand, usually within the hour. Rent starts flowing at the first hourly collection after that.</p>
+        <label style="margin-top:10px">Already launched? Register the address<input id="fCa" placeholder="0x… (the coin's contract address)" maxlength="42"></label>
+        <div class="btns" style="justify-content:flex-start">
+          <button class="btn" type="button" id="checkCa">Check on chain</button>
+          <a class="btn" id="announce" href="#" target="_blank" rel="noopener" hidden>Announce on X ↗</a>
+        </div>
+        <div class="out" id="caOut" hidden></div>
+      </form>
+      <div class="sticky">
+        <div class="eyebrow">preview</div>
+        <div class="card" id="preview"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="roll">
+  <div class="wrap">
+    <div class="eyebrow">rent roll</div>
+    <h2>Every hour, the rent is collected.</h2>
+    <p class="lead">Fees → $USDG → buy the stock → sent to the landlords' wallets. Every collection is logged here with its transaction.</p>
+    <table id="rollTable" hidden><thead><tr><th>when</th><th>property</th><th>paid</th><th>to</th><th>tx</th></tr></thead><tbody></tbody></table>
+    <div class="empty" id="rollEmpty"><b>No rent collected yet.</b>The first collection happens one hour after launch.</div>
+
+    <div class="calc">
+      <div>
+        <div class="eyebrow" style="color:#94A3B8">cap-rate calculator</div>
+        <div class="form">
+          <label>Market cap ($)<input id="cMcap" type="number" inputmode="decimal" value="200000" min="0"></label>
+          <label>24h volume ($)<input id="cVol" type="number" inputmode="decimal" value="50000" min="0"></label>
+        </div>
+        <p class="note" style="color:#94A3B8">How the headline is computed for every property. Rent = 1% of every trade; 0.7% reaches the landlords.</p>
+      </div>
+      <div class="res">
+        <div class="big" id="cCap">—</div>
+        <div><span>cap rate (annualized)</span><b id="cCap2">—</b></div>
+        <div><span>rent per day</span><b id="cDay">—</b></div>
+        <div><span>rent per hour</span><b id="cHour">—</b></div>
+        <div><span>to Pons per day</span><b id="cPons">—</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="eyebrow">how it works</div>
+    <h2>Traders pay. Landlords collect.</h2>
+    <div class="steps">
+      <div class="step"><div class="n">01</div><h3>List</h3><p>Name a property, pick the stock it pays in, set the rent wallet. Launch it on Pons with the RENT description.</p></div>
+      <div class="step"><div class="n">02</div><h3>Rent</h3><p>Every trade on the property pays 1% rent. 0.7% goes to the rent wallet, 0.3% to Pons. Curve fees before graduation, pool fees after.</p></div>
+      <div class="step"><div class="n">03</div><h3>Collect</h3><p>Every hour the rent wallet swaps what it holds to $USDG, buys the stock, and sends it to every holder's wallet, pro rata.</p></div>
+      <div class="step"><div class="n">04</div><h3>Cap rate</h3><p>Each property is priced like real estate: 24h rent ÷ market cap, annualized. Read from the chain, never typed in.</p></div>
+    </div>
+    <div class="rule">
+      <div><i>I.</i><span>Every coin is a property. It picks the stock it pays in.</span></div>
+      <div><i>II.</i><span>Every trade pays rent: 1%.</span></div>
+      <div><i>III.</i><span>Every hour the rent becomes the stock and goes to the holders.</span></div>
+      <div><i>IV.</i><span>Cap rate, not market cap. Read from the chain, never typed in.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="token">
+  <div class="wrap">
+    <div class="eyebrow">the token</div>
+    <h2>$RENT is the first property.</h2>
+    <p class="lead">The pad's own coin, listed the same way as every other property. It pays in $<span id="tokStock">NVDA</span>. Its numbers below come from the same reader as the street.</p>
+    <div class="tiles">
+      <div class="tile"><div class="l">pays in</div><div class="v">$<span id="tStock">NVDA</span></div></div>
+      <div class="tile"><div class="l">rent</div><div class="v">1% <small>per trade</small></div></div>
+      <div class="tile"><div class="l">to landlords</div><div class="v">0.7% <small>every hour</small></div></div>
+      <div class="tile"><div class="l">to pons</div><div class="v">0.3%</div></div>
+      <div class="tile"><div class="l">cap rate</div><div class="v" id="tCap">—</div></div>
+      <div class="tile"><div class="l">tenants</div><div class="v" id="tTen">—</div></div>
+      <div class="tile"><div class="l">market cap</div><div class="v" id="tMcap">—</div></div>
+      <div class="tile"><div class="l">rent / hr</div><div class="v" id="tRent">—</div></div>
+    </div>
+    <div class="ca" id="caRow" hidden><span>CA</span><span id="caText"></span><button class="btn" type="button" id="copyCa">Copy</button></div>
+    <div class="btns" id="tokLinks" style="margin-top:24px"></div>
+    <p class="note" id="tokNote" style="text-align:center"></p>
+  </div>
+</section>
+
+<footer><svg class="k" viewBox="0 0 100 100" id="footKey"></svg>rent · every coin is a property</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+// ------------------------------------------------------------------ helpers
+const $ = s => document.querySelector(s);
+const NAVY = '#0F172A', CORAL = '#FF7A59', CREAM = '#FAF7F1';
+const fmtUsd = v => v == null ? '—' : v >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M' : v >= 1e3 ? '$' + (v / 1e3).toFixed(1) + 'K' : '$' + v.toFixed(v < 10 ? 2 : 0);
+const fmtPct = v => v == null ? '—' : (v * 100).toFixed(v * 100 >= 100 ? 0 : 1) + '%';
+const fmtN = v => v == null ? '—' : Number(v).toLocaleString('en-US');
+function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 1800); }
+async function copy(t) { try { await navigator.clipboard.writeText(t); toast('Copied'); } catch (e) { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('Copied'); } }
+function hash(s) { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; }
+function rng(seed) { let s = seed >>> 0 || 1; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
+const isAddr = s => /^0x[0-9a-fA-F]{40}$/.test(s || '');
+
+// the house-key mark (same geometry as the PFP)
+function keySVG(cls) {
+  return `<svg class="${cls || ''}" viewBox="0 0 100 100" aria-hidden="true"><defs><mask id="km${hash(cls)}"><rect width="100" height="100" fill="#fff"/><circle cx="52" cy="36" r="8.5" fill="#000"/></mask></defs>
+  <g mask="url(#km${hash(cls)})" fill="${NAVY}" stroke="${NAVY}" stroke-width="6" stroke-linejoin="round"><polygon points="31,50 31,30 52,8 73,30 73,50"/></g>
+  <rect x="44" y="47" width="16" height="9" rx="2.5" fill="${NAVY}"/><rect x="48" y="48" width="8" height="46" rx="4" fill="${NAVY}"/>
+  <rect x="35" y="72.4" width="14" height="7.2" rx="2.4" fill="${NAVY}"/><rect x="38.5" y="82.4" width="10.5" height="7.2" rx="2.4" fill="${NAVY}"/>
+  <rect x="44" y="50.5" width="16" height="3.7" rx="1.8" fill="${CORAL}"/></svg>`;
+}
+$('#footKey').outerHTML = keySVG('k');
+$('.keys').innerHTML = ['k1', 'k2', 'k3', 'k4'].map(c => keySVG(c).replace('<svg', '<svg style="overflow:visible"')).join('');
+// strings above the hanging keys
+document.querySelectorAll('.keys svg').forEach(s => { s.setAttribute('viewBox', '0 -60 100 160'); s.insertAdjacentHTML('afterbegin', `<line x1="52" y1="-60" x2="52" y2="10" stroke="${NAVY}" stroke-width="2.5"/>`); });
+
+// a flat building for a property — deterministic from its name
+function buildingSVG(seed, stock, opts = {}) {
+  const r = rng(hash(seed)); const W = 220, H = 150;
+  const bw = 90 + Math.floor(r() * 70), bh = 70 + Math.floor(r() * 55);
+  const x = (W - bw) / 2, top = H - bh;
+  let s = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  const kind = r();
+  s += `<rect x="${x}" y="${top}" width="${bw}" height="${bh}" fill="${NAVY}"/>`;
+  let roof = top;
+  if (kind < 0.35) { roof = top - bw * 0.26; s += `<polygon points="${x - 5},${top} ${x + bw / 2},${roof} ${x + bw + 5},${top}" fill="${NAVY}"/>`; }
+  else if (kind < 0.65) { s += `<rect x="${x - 3}" y="${top - 6}" width="${bw + 6}" height="6" fill="${NAVY}"/>`; roof = top - 6; if (r() < .6) { const tx = x + bw * .62; s += `<rect x="${tx}" y="${top - 26}" width="16" height="16" fill="${NAVY}"/><polygon points="${tx - 2},${top - 26} ${tx + 8},${top - 33} ${tx + 18},${top - 26}" fill="${NAVY}"/>`; } }
+  else { s += `<rect x="${x + bw * .2}" y="${top - 10}" width="${bw * .6}" height="10" fill="${NAVY}"/><rect x="${x + bw * .4}" y="${top - 18}" width="${bw * .2}" height="8" fill="${NAVY}"/>`; roof = top - 18; }
+  const cols = Math.max(1, Math.floor((bw - 14) / 20)), rows = Math.max(1, Math.floor((bh - 30) / 22));
+  const ox = x + (bw - (cols * 20 - 8)) / 2;
+  for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) { const wx = ox + i * 20, wy = top + 10 + j * 22; if (wy + 13 > H - 22) continue; s += `<rect x="${wx}" y="${wy}" width="12" height="13" rx="1.5" fill="${r() > .2 ? CREAM : CORAL}"/>`; }
+  s += `<rect x="${x + bw / 2 - 7}" y="${H - 20}" width="14" height="20" rx="3" fill="${CREAM}"/>`;
+  if (r() < .5) s += `<rect x="${x + bw / 2 - 13}" y="${H - 24}" width="26" height="4" fill="${CORAL}"/>`;
+  s += `<rect x="0" y="${H - 2}" width="${W}" height="2" fill="${NAVY}"/>`;
+  // rooftop sign with the stock
+  if (stock) { const t = '$' + stock; const pw = t.length * 8.4 + 18, ph = 20, px = x + bw / 2 - pw / 2, py = roof - 10 - ph;
+    s += `<rect x="${px + 6}" y="${py + ph - 1}" width="2" height="${roof - py - ph + 1}" fill="${NAVY}"/><rect x="${px + pw - 8}" y="${py + ph - 1}" width="2" height="${roof - py - ph + 1}" fill="${NAVY}"/>`;
+    s += `<rect x="${px}" y="${py}" width="${pw}" height="${ph}" rx="4" fill="${CREAM}" stroke="${NAVY}" stroke-width="1.6"/><text x="${px + pw / 2}" y="${py + 14.2}" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="12" fill="${NAVY}">${t}</text>`; }
+  return s + '</svg>';
+}
+
+// ------------------------------------------------------------------ hero street canvas
+function drawStreet(stocks) {
+  const c = $('#street'); const dpr = Math.min(2, devicePixelRatio || 1);
+  const W = c.clientWidth, H = c.clientHeight; c.width = W * dpr; c.height = H * dpr;
+  const g = c.getContext('2d'); g.scale(dpr, dpr); g.clearRect(0, 0, W, H);
+  const r = rng(5);
+  // far row
+  g.globalAlpha = .28; g.fillStyle = '#7876AA';
+  for (let x = -20; x < W + 20;) { const bw = 40 + r() * 70, bh = H * (.35 + r() * .45); g.fillRect(x, H - bh, bw, bh); x += bw + 6 + r() * 14; }
+  g.globalAlpha = 1;
+  const signs = []; const r2 = rng(9);
+  for (let x = -10; x < W + 10;) {
+    const bw = 44 + r2() * 70, bh = H * (.22 + r2() * .48), top = H - bh;
+    g.fillStyle = NAVY; g.fillRect(x, top, bw, bh);
+    const k = r2(); let roof = top;
+    if (k < .35) { roof = top - bw * .25; g.beginPath(); g.moveTo(x - 4, top); g.lineTo(x + bw / 2, roof); g.lineTo(x + bw + 4, top); g.fill(); }
+    else if (k < .6) { g.fillRect(x - 3, top - 5, bw + 6, 5); roof = top - 5; }
+    else { g.fillRect(x + bw * .2, top - 9, bw * .6, 9); g.fillRect(x + bw * .4, top - 16, bw * .2, 7); roof = top - 16; }
+    const cols = Math.max(1, Math.floor((bw - 10) / 18)), rows = Math.max(1, Math.floor((bh - 26) / 20)); const ox = x + (bw - (cols * 18 - 7)) / 2;
+    for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) { const wy = top + 9 + j * 20; if (wy + 12 > H - 18) continue; g.fillStyle = r2() > .2 ? CREAM : CORAL; g.fillRect(ox + i * 18, wy, 11, 12); }
+    g.fillStyle = CREAM; g.fillRect(x + bw / 2 - 6, H - 16, 12, 16);
+    if (bw > 64 && k >= .35) signs.push({ cx: x + bw / 2, roof });
+    x += bw + 5 + r2() * 16;
+  }
+  g.fillStyle = NAVY; g.fillRect(0, H - 2, W, 2);
+  // rooftop signs: the listed properties' stocks (or the pair stocks when the street is empty)
+  const list = stocks.length ? stocks : TAPE.slice(0, 6);
+  const gap = W / (list.length + 1); let li = 0, lastx = -1e9;
+  g.font = '800 11px Inter,system-ui,sans-serif'; g.textAlign = 'center';
+  for (const sg of signs) { if (li >= list.length) break; if (sg.cx - lastx < gap * .8) continue; const t = '$' + list[li++]; const pw = g.measureText(t).width + 16, ph = 20, px = sg.cx - pw / 2, py = sg.roof - 8 - ph;
+    g.fillStyle = NAVY; g.fillRect(px + 5, py + ph, 2, 8); g.fillRect(px + pw - 7, py + ph, 2, 8);
+    g.fillStyle = CREAM; g.strokeStyle = NAVY; g.lineWidth = 1.5; g.beginPath(); g.roundRect(px, py, pw, ph, 4); g.fill(); g.stroke();
+    g.fillStyle = NAVY; g.fillText(t, sg.cx, py + 14); lastx = sg.cx; }
+}
+
+// ------------------------------------------------------------------ quotes tape
+async function loadTape() {
+  try {
+    const j = await (await fetch('/api/quote?s=' + TAPE.join(','))).json();
+    const items = (j.quotes || []).filter(q => q.price).map(q => `<span class="q">$${q.s} <span class="c">${q.price.toFixed(2)}</span> ${q.change == null ? '' : `<span class="${q.change >= 0 ? 'up' : 'dn'}">${q.change >= 0 ? '▲' : '▼'} ${(Math.abs(q.change) * 100).toFixed(2)}%</span>`}</span>`);
+    if (!items.length) throw 0;
+    $('#tapeRow').innerHTML = items.join('') + items.join('');
+  } catch (e) { $('#tapeRow').innerHTML = TAPE.map(s => `<span class="q">$${s} <span class="c">quote unavailable</span></span>`).join('').repeat(2); }
+}
+
+// ------------------------------------------------------------------ the street (board)
+let PROPS = [], SORT = 'cap';
+async function loadBoard() {
+  let reg = [];
+  try { reg = await (await fetch('properties.json?t=' + Date.now())).json(); } catch (e) { reg = []; }
+  if (!Array.isArray(reg)) reg = [];
+  PROPS = reg.map(p => ({ ...p, live: null }));
+  renderBoard();
+  drawStreet(PROPS.map(p => p.stock).filter(Boolean));
+  await Promise.all(PROPS.map(async p => { try { p.live = await (await fetch('/api/coin?ca=' + p.ca)).json(); } catch (e) { p.live = { error: true }; } }));
+  renderBoard();
+}
+function propCard(p, live, preview) {
+  const L = live || {};
+  const trade = p.pool || (p.ca ? `https://ponsfamily.com/launchpad/${p.ca}` : '');
+  const chart = L.chart || (p.ca ? `https://dexscreener.com/robinhood/${p.ca}` : '');
+  const holders = p.ca ? `https://robinhoodchain.blockscout.com/token/${p.ca}?tab=holders` : '';
+  return `<div class="sky">${buildingSVG(p.name || p.ticker || 'x', p.stock)}</div>
+  <div class="body">
+    <div class="name"><b>${esc(p.name || 'Property')}</b><span class="chip navy">$${esc(p.ticker || '—')}</span></div>
+    <div style="margin-top:8px"><span class="chip">pays in $${esc(p.stock || '—')}</span> ${p.listed ? `<span class="chip mute">listed ${esc(p.listed)}</span>` : ''}</div>
+    <div class="cap"><b>${L.capRate != null ? fmtPct(L.capRate) : '—'}</b><span>cap rate${L.capRate == null && p.ca ? (L.dex === 'no pair yet' ? ' · no pair yet' : L.error ? ' · reader offline' : ' · reading…') : ''}</span></div>
+    <div class="stats">
+      <div><span>rent / hr</span><b>${fmtUsd(L.rentPerHour)}</b></div>
+      <div><span>tenants</span><b>${fmtN(L.holders)}</b></div>
+      <div><span>market cap</span><b>${fmtUsd(L.mcap)}</b></div>
+      <div><span>24h volume</span><b>${fmtUsd(L.volume24)}</b></div>
+    </div>
+    ${preview ? '' : `<div class="links">${trade ? `<a href="${trade}" target="_blank" rel="noopener">trade ↗</a>` : ''}${chart ? `<a href="${chart}" target="_blank" rel="noopener">chart ↗</a>` : ''}${holders ? `<a href="${holders}" target="_blank" rel="noopener">tenants ↗</a>` : ''}</div>`}
+  </div>`;
+}
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function renderBoard() {
+  const b = $('#board'); const empty = $('#boardEmpty');
+  if (!PROPS.length) { b.innerHTML = ''; empty.hidden = false; return; }
+  empty.hidden = true;
+  const v = (p, k) => (p.live && p.live[k] != null) ? p.live[k] : -1;
+  const arr = PROPS.slice();
+  if (SORT === 'cap') arr.sort((a, b) => v(b, 'capRate') - v(a, 'capRate'));
+  if (SORT === 'rent') arr.sort((a, b) => v(b, 'rentPerHour') - v(a, 'rentPerHour'));
+  if (SORT === 'tenants') arr.sort((a, b) => v(b, 'holders') - v(a, 'holders'));
+  if (SORT === 'new') arr.sort((a, b) => String(b.listed || '').localeCompare(String(a.listed || '')));
+  b.innerHTML = arr.map(p => `<div class="card">${propCard(p, p.live)}</div>`).join('');
+}
+$('#sort').addEventListener('click', e => {
+  const k = e.target.dataset.k; if (!k) return;
+  if (k === 'refresh') { toast('Reading the chain…'); loadBoard(); return; }
+  SORT = k; document.querySelectorAll('#sort button').forEach(x => x.classList.toggle('on', x.dataset.k === k)); renderBoard();
+});
+
+// ------------------------------------------------------------------ list a property
+const sel = $('#fStock'); sel.innerHTML = STOCKS.map(s => `<option ${s === CONFIG.stock ? 'selected' : ''}>${s}</option>`).join('');
+function formState() { return { name: $('#fName').value.trim() || '', ticker: $('#fTicker').value.trim().toUpperCase().replace(/[^A-Z0-9]/g, ''), stock: sel.value, wallet: $('#fWallet').value.trim() }; }
+function updateForm() {
+  const f = formState(); $('#fTicker').value = f.ticker;
+  const desc = `RENT · property · pays in $${f.stock} · rent wallet ${isAddr(f.wallet) ? f.wallet : '0x…'} · every trade pays 1% rent, landlords are paid every hour in $${f.stock} · rent is due every hour.`;
+  $('#fDesc').value = desc;
+  $('#preview').innerHTML = propCard({ name: f.name || 'Your property', ticker: f.ticker || 'TICK', stock: f.stock }, null, true);
+}
+['fName', 'fTicker', 'fStock', 'fWallet'].forEach(id => $('#' + id).addEventListener('input', updateForm));
+$('#copyDesc').addEventListener('click', () => copy($('#fDesc').value));
+$('#openPons').href = CONFIG.launchpad;
+$('#listForm').addEventListener('submit', e => e.preventDefault());
+$('#checkCa').addEventListener('click', async () => {
+  const ca = $('#fCa').value.trim(); const out = $('#caOut'); const ann = $('#announce');
+  out.hidden = false; ann.hidden = true; out.className = 'out';
+  if (!isAddr(ca)) { out.classList.add('bad'); out.textContent = 'That is not a contract address (0x + 40 hex characters).'; return; }
+  out.textContent = 'Reading Blockscout and Dexscreener…';
+  try {
+    const L = await (await fetch('/api/coin?ca=' + ca)).json();
+    if (L.error) throw new Error(L.error);
+    const f = formState();
+    out.classList.add(L.name ? 'ok' : 'bad');
+    out.innerHTML = `<div class="kv">
+      <span>name</span><b>${esc(L.name || 'not found on Blockscout yet')}</b>
+      <span>symbol</span><b>${esc(L.symbol || '—')}</b>
+      <span>tenants</span><b>${fmtN(L.holders)}</b>
+      <span>market cap</span><b>${fmtUsd(L.mcap)}${L.dex === 'no pair yet' ? ' (no Dexscreener pair yet)' : ''}</b>
+      <span>cap rate</span><b>${fmtPct(L.capRate)}</b>
+      <span>address</span><b>${esc(ca)}</b></div>
+      <p class="note">${L.name ? 'Found. Announce it and we add it to the street once the Pons description checks out.' : 'Not indexed yet — a fresh launch can take a few minutes to appear. Try again shortly.'}</p>`;
+    const tweet = `Listed a property on RENT: $${L.symbol || f.ticker || 'TICK'} pays in $${f.stock}. Traders pay the rent, holders are the landlords.\n\nCA: ${ca}\n${location.origin}${location.pathname}`;
+    ann.href = 'https://x.com/intent/tweet?text=' + encodeURIComponent(tweet); ann.hidden = false;
+  } catch (e) { out.classList.add('bad'); out.textContent = 'The reader could not reach the chain: ' + (e.message || e); }
+});
+updateForm();
+
+// ------------------------------------------------------------------ rent roll + calculator
+async function loadRoll() {
+  let rows = []; try { rows = await (await fetch('payouts.json?t=' + Date.now())).json(); } catch (e) { }
+  if (!Array.isArray(rows) || !rows.length) return;
+  $('#rollEmpty').hidden = true; const t = $('#rollTable'); t.hidden = false;
+  t.querySelector('tbody').innerHTML = rows.slice().reverse().map(r => `<tr><td>${esc(r.t || '')}</td><td>$${esc(r.ticker || '')}</td><td>${esc(r.amount || '')} $${esc(r.stock || '')}</td><td>${esc(r.wallets != null ? r.wallets + ' wallets' : '')}</td><td>${r.tx ? `<a href="${esc(r.tx)}" target="_blank" rel="noopener">tx ↗</a>` : ''}</td></tr>`).join('');
+}
+function calc() {
+  const m = +$('#cMcap').value || 0, v = +$('#cVol').value || 0;
+  const day = v * 0.007, hour = day / 24, pons = v * 0.003, cap = m ? day * 365 / m : null;
+  $('#cCap').textContent = cap == null ? '—' : fmtPct(cap); $('#cCap2').textContent = cap == null ? '—' : fmtPct(cap);
+  $('#cDay').textContent = fmtUsd(day); $('#cHour').textContent = fmtUsd(hour); $('#cPons').textContent = fmtUsd(pons);
+}
+['cMcap', 'cVol'].forEach(id => $('#' + id).addEventListener('input', calc)); calc();
+
+// ------------------------------------------------------------------ token
+async function loadToken() {
+  $('#tStock').textContent = CONFIG.stock; $('#tokStock').textContent = CONFIG.stock; $('#emptyStock').textContent = CONFIG.stock;
+  if (CONFIG.x && CONFIG.x !== 'https://x.com/') $('#heroX').href = CONFIG.x; else $('#heroX').remove();
+  const links = [];
+  if (CONFIG.pool) { links.push(`<a class="btn fill" href="${CONFIG.pool}" target="_blank" rel="noopener">Trade $RENT ↗</a>`); $('#heroTrade').href = CONFIG.pool; $('#heroTrade').target = '_blank'; }
+  if (CONFIG.chart) links.push(`<a class="btn" href="${CONFIG.chart}" target="_blank" rel="noopener">Chart ↗</a>`);
+  if (CONFIG.ca) links.push(`<a class="btn" href="https://robinhoodchain.blockscout.com/token/${CONFIG.ca}?tab=holders" target="_blank" rel="noopener">Tenants ↗</a>`);
+  $('#tokLinks').innerHTML = links.join('');
+  if (CONFIG.ca) {
+    $('#caRow').hidden = false; $('#caText').textContent = CONFIG.ca; $('#copyCa').onclick = () => copy(CONFIG.ca);
+    try { const L = await (await fetch('/api/coin?ca=' + CONFIG.ca)).json();
+      $('#tCap').textContent = fmtPct(L.capRate); $('#tTen').textContent = fmtN(L.holders); $('#tMcap').textContent = fmtUsd(L.mcap); $('#tRent').textContent = fmtUsd(L.rentPerHour);
+      $('#tokNote').textContent = L.dex === 'no pair yet' ? 'No Dexscreener pair yet — the cap rate appears once the first trades settle.' : '';
+    } catch (e) { $('#tokNote').textContent = 'The reader could not reach the chain right now.'; }
+  } else { $('#tokNote').textContent = 'The address appears here at launch.'; $('#heroTrade').textContent = 'Launch on Pons ↗'; $('#heroTrade').href = CONFIG.launchpad; $('#heroTrade').target = '_blank'; }
+}
+
+// ------------------------------------------------------------------ sound: a soft city pad (synthesized, nothing licensed)
+let AC = null, SND = null;
+function sound(on) {
+  const b = $('#snd'); b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); b.textContent = on ? 'snd ●' : 'snd';
+  if (!on) { if (SND) { SND.gain.gain.linearRampToValueAtTime(0, AC.currentTime + .6); setTimeout(() => { try { SND.nodes.forEach(n => n.stop && n.stop()); } catch (e) { } SND = null; }, 700); } return; }
+  AC = AC || new (window.AudioContext || window.webkitAudioContext)(); AC.resume();
+  const gain = AC.createGain(); gain.gain.value = 0; gain.connect(AC.destination); gain.gain.linearRampToValueAtTime(.18, AC.currentTime + 2);
+  const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900; lp.connect(gain);
+  const nodes = [];
+  // chord pad: Fmaj7 → Am7 → Dm7 → G7, slow
+  const chords = [[174.6, 220, 261.6, 329.6], [220, 261.6, 329.6, 392], [146.8, 174.6, 220, 261.6], [196, 246.9, 293.7, 349.2]];
+  const oscs = chords[0].map((f, i) => { const o = AC.createOscillator(); o.type = i % 2 ? 'triangle' : 'sine'; o.frequency.value = f; const g = AC.createGain(); g.gain.value = .12; o.connect(g); g.connect(lp); o.start(); nodes.push(o); return o; });
+  let ci = 0; const step = () => { if (!SND) return; ci = (ci + 1) % chords.length; oscs.forEach((o, i) => o.frequency.linearRampToValueAtTime(chords[ci][i], AC.currentTime + 1.2)); SND.t = setTimeout(step, 6000); };
+  // city hum: filtered noise
+  const buf = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate); const d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * .5;
+  const n = AC.createBufferSource(); n.buffer = buf; n.loop = true; const nf = AC.createBiquadFilter(); nf.type = 'lowpass'; nf.frequency.value = 220; const ng = AC.createGain(); ng.gain.value = .35; n.connect(nf); nf.connect(ng); ng.connect(gain); n.start(); nodes.push(n);
+  SND = { gain, nodes, t: setTimeout(step, 6000) };
+}
+$('#snd').addEventListener('click', () => sound(!SND));
+
+// ------------------------------------------------------------------ boot
+loadTape(); loadBoard(); loadRoll(); loadToken();
+addEventListener('resize', () => drawStreet(PROPS.map(p => p.stock).filter(Boolean)));
+setInterval(loadTape, 120000); setInterval(loadBoard, 60000);
+</script>
+</body>
+</html>

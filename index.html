@@ -7,7 +7,8 @@
 <meta name="description" content="Every coin is a property. Traders pay the rent. Holders are the landlords, paid every hour in the stock.">
 <meta property="og:title" content="Rent — every coin is a property">
 <meta property="og:description" content="Traders pay the rent. Holders are the landlords, paid every hour in the stock. Rent is due every hour.">
-<meta property="og:image" content="assets/og.jpg">
+<meta property="og:image" content="https://rent-two-pi.vercel.app/assets/og.jpg">
+<meta name="theme-color" content="#FAF7F1">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=2">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=2">
@@ -183,8 +184,26 @@ tr:last-child td{border-bottom:0}
 .tile .v small{font-size:14px;color:var(--mute);font-weight:600}
 .ca{display:flex;gap:10px;align-items:center;margin-top:24px;padding:14px 16px;background:#fff;border:1.5px solid var(--navy);border-radius:14px;font:600 14px/1.4 Inter;word-break:break-all}
 .ca button{white-space:nowrap}
+.rv{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+.rv.in{opacity:1;transform:none}
+.clock{margin-top:32px;background:var(--navy);color:#fff;border-radius:22px;padding:28px;display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center}
+@media(max-width:720px){.clock{grid-template-columns:1fr}}
+.clock .t{font-size:clamp(56px,9vw,96px);font-weight:800;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums;color:#fff}
+.clock .l{font:600 12px/1 Inter;letter-spacing:.12em;text-transform:uppercase;color:#94A3B8;display:flex;align-items:center;gap:8px}
+.clock .l i{width:8px;height:8px;border-radius:50%;background:var(--coral);display:inline-block;animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.25}}
+.clock p{margin:10px 0 0;color:#CBD5E1;font-size:15px;max-width:520px}
+.clock .pb{height:6px;border-radius:999px;background:#1E293B;overflow:hidden;margin-top:14px;max-width:520px}
+.clock .pb i{display:block;height:100%;background:var(--coral);width:0;transition:width 1s linear}
+.total{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.total .chip{font-size:13px;padding:8px 12px}
+.hero .grain,#loader .grain{position:absolute;inset:0;pointer-events:none;opacity:.16;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.06 0 0 0 0 0.09 0 0 0 0 0.16 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+#loader{transition:transform .8s cubic-bezier(.7,0,.2,1),opacity .8s}
+#loader.out{transform:translateY(-100%);opacity:1}
 footer{padding:48px 0;text-align:center;color:var(--mute);font-size:13px}
 footer .k{width:36px;margin:0 auto 12px;display:block}
+footer .fl{display:flex;justify-content:center;gap:18px;margin-top:10px}
+footer .fl a{font-weight:600;text-decoration:none;color:var(--navy)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--navy);color:#fff;padding:12px 18px;border-radius:999px;font:600 13px/1 Inter;transition:.25s;pointer-events:none;z-index:50}
 .toast.show{opacity:1;transform:translateX(-50%)}
 </style>
@@ -198,6 +217,7 @@ footer .k{width:36px;margin:0 auto 12px;display:block}
   <div class="log" id="llog"></div>
   <button class="btn fill enter" id="lenter" type="button">ENTER</button>
   <canvas id="lstreet" aria-hidden="true"></canvas>
+  <div class="grain"></div>
 </div>
 
 <nav><ul>
@@ -210,6 +230,7 @@ footer .k{width:36px;margin:0 auto 12px;display:block}
 </ul></nav>
 
 <header class="hero">
+  <div class="grain"></div>
   <div class="keys" aria-hidden="true"></div>
   <div class="wrap">
     <h1 class="word">rent</h1>
@@ -237,6 +258,7 @@ footer .k{width:36px;margin:0 auto 12px;display:block}
       <button data-k="new">newest</button>
       <button data-k="refresh" style="margin-left:auto">↻ refresh</button>
     </div>
+    <div class="total" id="total" hidden></div>
     <div class="grid" id="board"></div>
     <div class="empty" id="boardEmpty" hidden><b>No properties on the street yet.</b>The first one is listed at launch. It pays in $<span id="emptyStock">NVDA</span>.</div>
   </div>
@@ -283,6 +305,10 @@ footer .k{width:36px;margin:0 auto 12px;display:block}
     <div class="eyebrow">rent roll</div>
     <h2>Every hour, the rent is collected.</h2>
     <p class="lead">Fees → $USDG → buy the stock → sent to the landlords' wallets. Every collection is logged here with its transaction.</p>
+    <div class="clock">
+      <div><div class="l"><i></i>next collection in</div><div class="t" id="clock">--:--</div></div>
+      <div><p>Every hour on the hour the rent wallet swaps what it holds to $USDG, buys the stock and sends it to every landlord's wallet. Nobody can time it, everybody can see it coming.</p><div class="pb"><i id="clockBar"></i></div></div>
+    </div>
     <table id="rollTable" hidden><thead><tr><th>when</th><th>property</th><th>paid</th><th>to</th><th>tx</th></tr></thead><tbody></tbody></table>
     <div class="empty" id="rollEmpty"><b>No rent collected yet.</b>The first collection happens one hour after launch.</div>
 
@@ -346,7 +372,7 @@ footer .k{width:36px;margin:0 auto 12px;display:block}
   </div>
 </section>
 
-<footer><svg class="k" viewBox="0 0 100 100" id="footKey"></svg>rent · every coin is a property</footer>
+<footer><svg class="k" viewBox="0 0 100 100" id="footKey"></svg>rent · every coin is a property<div class="fl" id="footLinks"><a href="#list">list a property</a><a href="#roll">rent roll</a></div></footer>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -379,6 +405,10 @@ function drawLoaderStreet(progress) {
   const c = $('#lstreet'); if (!c) return; const dpr = Math.min(2, devicePixelRatio || 1);
   const W = c.clientWidth, H = c.clientHeight; c.width = W * dpr; c.height = H * dpr;
   const g = c.getContext('2d'); g.scale(dpr, dpr); g.clearRect(0, 0, W, H);
+  // low sun + far row
+  const sg = g.createRadialGradient(W * .68, H * 1.05, 0, W * .68, H * 1.05, H * .98); sg.addColorStop(0, 'rgba(255,214,170,.75)'); sg.addColorStop(1, 'rgba(255,214,170,0)'); g.fillStyle = sg; g.fillRect(0, 0, W, H);
+  const rf = rng(7); g.fillStyle = 'rgba(120,118,170,.30)';
+  for (let x = -20; x < W + 20;) { const bw = 36 + rf() * 60, bh = H * (.4 + rf() * .5); g.fillRect(x, H - bh, bw, bh); x += bw + 6 + rf() * 12; }
   const r = rng(21); let lit = 0, total = 0; const rw = rng(33);
   for (let x = -10; x < W + 10;) {
     const bw = 40 + r() * 70, bh = H * (.25 + r() * .6), top = H - bh; const k = r();
@@ -434,6 +464,7 @@ function drawStreet(stocks) {
   const W = c.clientWidth, H = c.clientHeight; c.width = W * dpr; c.height = H * dpr;
   const g = c.getContext('2d'); g.scale(dpr, dpr); g.clearRect(0, 0, W, H);
   const r = rng(5);
+  const sg = g.createRadialGradient(W * .7, H * 1.05, 0, W * .7, H * 1.05, H * .98); sg.addColorStop(0, 'rgba(255,214,170,.7)'); sg.addColorStop(1, 'rgba(255,214,170,0)'); g.fillStyle = sg; g.fillRect(0, 0, W, H);
   // far row
   g.globalAlpha = .28; g.fillStyle = '#7876AA';
   for (let x = -20; x < W + 20;) { const bw = 40 + r() * 70, bh = H * (.35 + r() * .45); g.fillRect(x, H - bh, bw, bh); x += bw + 6 + r() * 14; }
@@ -519,6 +550,11 @@ function renderBoard() {
   if (SORT === 'tenants') arr.sort((a, b) => v(b, 'holders') - v(a, 'holders'));
   if (SORT === 'new') arr.sort((a, b) => String(b.listed || '').localeCompare(String(a.listed || '')));
   b.innerHTML = arr.map(p => `<div class="card">${propCard(p, p.live)}</div>`).join('');
+  // street totals — sums of live numbers only
+  const live = PROPS.filter(p => p.live && !p.live.error);
+  const rent = live.reduce((a, p) => a + (p.live.rentPerHour || 0), 0), ten = live.reduce((a, p) => a + (p.live.holders || 0), 0), mc = live.reduce((a, p) => a + (p.live.mcap || 0), 0);
+  const T = $('#total'); T.hidden = !live.length;
+  T.innerHTML = `<span class="chip navy">${PROPS.length} propert${PROPS.length === 1 ? 'y' : 'ies'}</span><span class="chip">${fmtUsd(rent)} rent / hr</span><span class="chip mute">${fmtN(ten)} tenants</span><span class="chip mute">${fmtUsd(mc)} on the street</span>`;
 }
 $('#sort').addEventListener('click', e => {
   const k = e.target.dataset.k; if (!k) return;
@@ -581,7 +617,7 @@ function calc() {
 // ------------------------------------------------------------------ token
 async function loadToken() {
   $('#tStock').textContent = CONFIG.stock; $('#tokStock').textContent = CONFIG.stock; $('#emptyStock').textContent = CONFIG.stock;
-  if (CONFIG.x && CONFIG.x !== 'https://x.com/') $('#heroX').href = CONFIG.x; else $('#heroX').remove();
+  if (CONFIG.x && CONFIG.x !== 'https://x.com/') { $('#heroX').href = CONFIG.x; $('#footLinks').insertAdjacentHTML('beforeend', `<a href="${CONFIG.x}" target="_blank" rel="noopener">X ↗</a>`); } else $('#heroX').remove();
   const links = [];
   if (CONFIG.pool) { links.push(`<a class="btn fill" href="${CONFIG.pool}" target="_blank" rel="noopener">Trade $RENT ↗</a>`); $('#heroTrade').href = CONFIG.pool; $('#heroTrade').target = '_blank'; }
   if (CONFIG.chart) links.push(`<a class="btn" href="${CONFIG.chart}" target="_blank" rel="noopener">Chart ↗</a>`);
@@ -615,6 +651,20 @@ function sound(on) {
   SND = { gain, nodes, t: setTimeout(step, 6000) };
 }
 $('#snd').addEventListener('click', () => sound(!SND));
+
+// ------------------------------------------------------------------ the rent clock (top of every hour)
+function tickClock() {
+  const now = new Date(); const next = new Date(now); next.setMinutes(60, 0, 0);
+  const left = Math.max(0, next - now); const m = Math.floor(left / 60000), sec = Math.floor(left / 1000) % 60;
+  $('#clock').textContent = String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+  $('#clockBar').style.width = (100 - left / 36000) + '%';
+}
+tickClock(); setInterval(tickClock, 1000);
+
+// reveal on scroll
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
+document.querySelectorAll('section .wrap > *').forEach(el => { el.classList.add('rv'); io.observe(el); });
+setTimeout(() => document.querySelectorAll('.rv').forEach(el => el.classList.add('in')), 4000); // never leave a section hidden
 
 // ------------------------------------------------------------------ boot
 loadTape(); loadBoard(); loadRoll(); loadToken();

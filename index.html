@@ -48,36 +48,13 @@ h2{font-size:clamp(30px,4.2vw,44px);line-height:1.05}
 section{padding:84px 0}
 section+section{border-top:1px solid var(--line)}
 
-/* loading screen — opaque, nav hidden, wordmark + key + bar + log + ENTER */
-body.loading{overflow:hidden}
-body.loading nav{display:none}
-#loader{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-bottom:150px;background:
- radial-gradient(60% 80% at 8% 30%,#FFBE96 0%,rgba(255,190,150,0) 60%),
- radial-gradient(50% 70% at 50% 35%,#DECDFF 0%,rgba(222,205,255,0) 60%),
- radial-gradient(60% 80% at 92% 30%,#A0D6FF 0%,rgba(160,214,255,0) 60%),#FAF7F1;transition:opacity .6s}
-#loader.out{opacity:0;pointer-events:none}
-#loader .lkey{width:150px;height:auto;overflow:visible;transform-origin:50% 0;animation:sway 4s ease-in-out infinite;filter:drop-shadow(0 14px 16px rgba(15,23,42,.2))}
-#loader .lword{font-size:clamp(64px,10vw,120px);line-height:.9;letter-spacing:-.05em;font-weight:800;margin:6px 0 26px}
-#loader .ltag{font-weight:600;font-size:18px;margin:10px 0 26px}
-#loader .bar{width:min(420px,80vw);height:8px;border-radius:999px;background:rgba(15,23,42,.12);overflow:hidden}
-#loader .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--navy) 0,var(--navy) calc(100% - 10px),var(--coral) calc(100% - 10px));border-radius:999px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
-#loader .log{margin:18px 0 0;height:116px;width:min(420px,80vw);text-align:left;font:500 13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#334155;overflow:hidden;white-space:pre-wrap}
-#loader .log div{opacity:0;animation:lin .4s forwards}
-@keyframes lin{to{opacity:1}}
-#loader .enter{margin-top:22px;opacity:0;pointer-events:none;transition:opacity .4s}
-#loader .enter.ready{opacity:1;pointer-events:auto;animation:pulse 1.6s ease-in-out infinite}
-@keyframes pulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-#lstreet{position:absolute;left:0;right:0;bottom:0;width:100%;height:150px;pointer-events:none}
-#loader>*:not(#lstreet){position:relative;z-index:1}
-@media(max-width:520px){#loader .log{height:120px}#lstreet{height:90px}#loader{padding-bottom:90px}}
-@media(max-height:780px){#loader .lkey{width:96px}#loader .lword{font-size:64px;margin:4px 0 16px}#loader .log{height:88px;margin-top:12px}#loader .enter{margin-top:14px}#lstreet{height:110px}#loader{padding-bottom:110px}}
-
 /* nav — links only, centered, one row */
 nav{position:sticky;top:0;z-index:20;background:rgba(250,247,241,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
 nav ul{list-style:none;margin:0;padding:0;display:flex;justify-content:center;gap:6px;flex-wrap:nowrap;overflow-x:auto}
 nav a,nav button{display:block;padding:14px 14px;font:600 13px/1 Inter;letter-spacing:.06em;text-transform:lowercase;color:var(--navy);text-decoration:none;background:none;border:0;cursor:pointer;white-space:nowrap}
 nav a:hover,nav button:hover{color:var(--coral)}
 nav button.on{color:var(--coral)}
+nav a.on{color:var(--coral)}
 
 /* hero */
 .hero{position:relative;overflow:hidden;background:
@@ -97,6 +74,9 @@ nav button.on{color:var(--coral)}
 .keys svg{position:absolute;top:0;width:min(9vw,110px);filter:drop-shadow(0 12px 14px rgba(15,23,42,.22));animation:sway 6s ease-in-out infinite;transform-origin:50% 0}
 .keys .k1{left:5%;height:auto}.keys .k2{left:13%;width:min(6.5vw,80px);animation-delay:-2s}.keys .k3{right:13%;width:min(6.5vw,80px);animation-delay:-4s}.keys .k4{right:5%;animation-delay:-1s}
 @keyframes sway{0%,100%{transform:rotate(3deg)}50%{transform:rotate(-3deg)}}
+.heroclock{display:inline-flex;align-items:center;gap:10px;margin-top:22px;padding:10px 16px;border-radius:999px;background:rgba(15,23,42,.9);color:#fff;font:600 13px/1 Inter;letter-spacing:.04em}
+.heroclock i{width:8px;height:8px;border-radius:50%;background:var(--coral);animation:blink 1.4s infinite}
+.heroclock b{font-variant-numeric:tabular-nums;font-weight:800;font-size:15px}
 #street{display:block;width:100%;height:220px;margin-top:40px}
 @media(max-width:720px){.keys .k2,.keys .k3{display:none}#street{height:150px}}
 
@@ -123,6 +103,19 @@ nav button.on{color:var(--coral)}
 .cap{margin:14px 0 6px;display:flex;align-items:baseline;gap:10px}
 .cap b{font-size:38px;font-weight:800;letter-spacing:-.03em;line-height:1}
 .cap span{color:var(--mute);font-size:13px;font-weight:600}
+.capbar{height:4px;border-radius:999px;background:#F1EEE6;overflow:hidden;margin:2px 0 8px}
+.capbar i{display:block;height:100%;background:linear-gradient(90deg,var(--coral),#FFB48A);width:0;transition:width .6s}
+.card .open{cursor:pointer}
+.sheet{position:fixed;inset:0;z-index:60;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s}
+.sheet.show{opacity:1;pointer-events:auto}
+.sheet .box{background:var(--cream);border-radius:24px;max-width:720px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 30px 80px rgba(15,23,42,.35);transform:translateY(12px);transition:transform .25s}
+.sheet.show .box{transform:none}
+.sheet .sky{background:linear-gradient(120deg,#FFBE96,#DECDFF 50%,#A0D6FF);padding:22px 22px 0;height:200px;display:flex;align-items:flex-end;justify-content:center;border-radius:24px 24px 0 0}
+.sheet .sky svg{width:60%;height:180px}
+.sheet .body{padding:24px}
+.sheet h3{font-size:28px;letter-spacing:-.03em}
+.sheet .kv{margin:16px 0;grid-template-columns:auto 1fr}
+.sheet .x{position:absolute;top:18px;right:18px;background:var(--navy);color:#fff;border:0;border-radius:999px;width:40px;height:40px;font:800 18px/1 Inter;cursor:pointer}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;margin:14px 0;font-size:13px}
 .stats div{display:flex;justify-content:space-between;border-bottom:1px dashed var(--line);padding:6px 0}
 .stats span{color:var(--mute)}.stats b{font-weight:600;font-variant-numeric:tabular-nums}
@@ -146,6 +139,11 @@ textarea{min-height:120px;resize:vertical;font-size:14px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .note{font-size:13px;color:var(--mute);margin-top:10px}
 .note b{color:var(--navy)}
+.rules{margin-top:6px;padding:14px 16px;border-radius:14px;background:#fff;border:1px solid var(--line);font-size:13px;color:#334155}
+.rules b{color:var(--navy)}
+.rules code{font:600 12px ui-monospace,Menlo,monospace;background:#F1EEE6;padding:2px 6px;border-radius:6px}
+.flow{margin-top:36px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px 18px;overflow-x:auto}
+.flow svg{display:block;min-width:720px;width:100%;height:auto}
 .sticky{position:sticky;top:70px}
 .out{margin-top:14px;padding:16px;border-radius:14px;background:#fff;border:1px solid var(--line);font-size:14px}
 .out.ok{border-color:#16a34a}.out.bad{border-color:#dc2626}
@@ -198,9 +196,7 @@ tr:last-child td{border-bottom:0}
 .clock .pb i{display:block;height:100%;background:var(--coral);width:0;transition:width 1s linear}
 .total{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
 .total .chip{font-size:13px;padding:8px 12px}
-.hero .grain,#loader .grain{position:absolute;inset:0;pointer-events:none;opacity:.16;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.06 0 0 0 0 0.09 0 0 0 0 0.16 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-#loader{transition:transform .8s cubic-bezier(.7,0,.2,1),opacity .8s}
-#loader.out{transform:translateY(-100%);opacity:1}
+.hero .grain{position:absolute;inset:0;pointer-events:none;opacity:.16;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.06 0 0 0 0 0.09 0 0 0 0 0.16 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 footer{padding:48px 0;text-align:center;color:var(--mute);font-size:13px}
 footer .k{width:36px;margin:0 auto 12px;display:block}
 footer .fl{display:flex;justify-content:center;gap:18px;margin-top:10px}
@@ -209,17 +205,7 @@ footer .fl a{font-weight:600;text-decoration:none;color:var(--navy)}
 .toast.show{opacity:1;transform:translateX(-50%)}
 </style>
 </head>
-<body class="loading">
-
-<div id="loader" role="dialog" aria-label="loading">
-  <div id="lkey"></div>
-  <div class="lword">rent</div>
-  <div class="bar"><i id="lbar"></i></div>
-  <div class="log" id="llog"></div>
-  <button class="btn fill enter" id="lenter" type="button">ENTER</button>
-  <canvas id="lstreet" aria-hidden="true"></canvas>
-  <div class="grain"></div>
-</div>
+<body>
 
 <nav><ul>
   <li><a href="#street">street</a></li>
@@ -241,6 +227,7 @@ footer .fl a{font-weight:600;text-decoration:none;color:var(--navy)}
       <a class="btn" id="heroTrade" href="#token">Buy $RENT</a>
       <a class="btn" id="heroX" href="#" target="_blank" rel="noopener">X ↗</a>
     </div>
+    <div class="heroclock"><i></i> next rent collection in <b id="heroClock">--:--</b></div>
   </div>
   <canvas id="street" aria-hidden="true"></canvas>
 </header>
@@ -261,6 +248,7 @@ footer .fl a{font-weight:600;text-decoration:none;color:var(--navy)}
     </div>
     <div class="total" id="total" hidden></div>
     <div class="grid" id="board"></div>
+    <div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="box" style="position:relative"><button class="x" id="sheetX" type="button" aria-label="close">×</button><div id="sheetBody"></div></div></div>
     <div class="empty" id="boardEmpty" hidden><b>No properties on the street yet.</b>The first one is listed at launch. It pays in $<span id="emptyStock">NVDA</span>.</div>
   </div>
 </section>
@@ -286,6 +274,7 @@ footer .fl a{font-weight:600;text-decoration:none;color:var(--navy)}
           <a class="btn coral" id="openPons" href="https://ponsvault.com/launch" target="_blank" rel="noopener">Open Pons launch ↗</a>
         </div>
         <p class="note"><b>What happens next.</b> Launch it on Pons with that description and the rent wallet as the fee recipient, then register the address below. We verify the description on chain and add the property to the street by hand, usually within the hour. Rent starts flowing at the first hourly collection after that.</p>
+        <div class="rules"><b>Listing rules.</b> The description starts with <code>RENT · property</code>. The fee recipient is the rent wallet. The stock is one from the Pons pair list. Nothing else — no allocation, no admin key, the same 1% as every property.</div>
         <label style="margin-top:10px">Already launched? Register the address<input id="fCa" placeholder="0x… (the coin's contract address)" maxlength="42"></label>
         <div class="btns" style="justify-content:flex-start">
           <button class="btn" type="button" id="checkCa">Check on chain</button>
@@ -343,6 +332,12 @@ footer .fl a{font-weight:600;text-decoration:none;color:var(--navy)}
       <div class="step"><div class="n">03</div><h3>Collect</h3><p>Every hour the rent wallet swaps what it holds to $USDG, buys the stock, and sends it to every holder's wallet, pro rata.</p></div>
       <div class="step"><div class="n">04</div><h3>Cap rate</h3><p>Each property is priced like real estate: 24h rent ÷ market cap, annualized. Read from the chain, never typed in.</p></div>
     </div>
+    <div class="flow" aria-label="how the rent flows">
+      <svg viewBox="0 0 1000 120" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0F172A"/></marker></defs>
+        <g transform="translate(20,14)"><rect width="140" height="92" rx="16" fill="#FAF7F1" stroke="#0F172A" stroke-width="1.5"/><text x="70" y="42" text-anchor="middle" font-family="Inter,system-ui" font-weight="800" font-size="17" fill="#0F172A">a trade</text><text x="70" y="64" text-anchor="middle" font-family="Inter,system-ui" font-weight="500" font-size="12" fill="#667085">on the property</text></g><line x1="162" y1="60" x2="183" y2="60" stroke="#0F172A" stroke-width="2" marker-end="url(#ar)"/><g transform="translate(185,14)"><rect width="140" height="92" rx="16" fill="#FAF7F1" stroke="#0F172A" stroke-width="1.5"/><text x="70" y="42" text-anchor="middle" font-family="Inter,system-ui" font-weight="800" font-size="17" fill="#0F172A">1% rent</text><text x="70" y="64" text-anchor="middle" font-family="Inter,system-ui" font-weight="500" font-size="12" fill="#667085">on every trade</text></g><line x1="327" y1="60" x2="348" y2="60" stroke="#0F172A" stroke-width="2" marker-end="url(#ar)"/><g transform="translate(350,14)"><rect width="140" height="92" rx="16" fill="#FAF7F1" stroke="#0F172A" stroke-width="1.5"/><text x="70" y="42" text-anchor="middle" font-family="Inter,system-ui" font-weight="800" font-size="17" fill="#0F172A">rent wallet</text><text x="70" y="64" text-anchor="middle" font-family="Inter,system-ui" font-weight="500" font-size="12" fill="#667085">0.7% · fee recipient</text></g><line x1="492" y1="60" x2="513" y2="60" stroke="#0F172A" stroke-width="2" marker-end="url(#ar)"/><g transform="translate(515,14)"><rect width="140" height="92" rx="16" fill="#FAF7F1" stroke="#0F172A" stroke-width="1.5"/><text x="70" y="42" text-anchor="middle" font-family="Inter,system-ui" font-weight="800" font-size="17" fill="#0F172A">$USDG</text><text x="70" y="64" text-anchor="middle" font-family="Inter,system-ui" font-weight="500" font-size="12" fill="#667085">swapped every hour</text></g><line x1="657" y1="60" x2="678" y2="60" stroke="#0F172A" stroke-width="2" marker-end="url(#ar)"/><g transform="translate(680,14)"><rect width="140" height="92" rx="16" fill="#FAF7F1" stroke="#0F172A" stroke-width="1.5"/><text x="70" y="42" text-anchor="middle" font-family="Inter,system-ui" font-weight="800" font-size="17" fill="#0F172A">the stock</text><text x="70" y="64" text-anchor="middle" font-family="Inter,system-ui" font-weight="500" font-size="12" fill="#667085">bought on chain</text></g><line x1="822" y1="60" x2="843" y2="60" stroke="#0F172A" stroke-width="2" marker-end="url(#ar)"/><g transform="translate(845,14)"><rect width="140" height="92" rx="16" fill="#0F172A" stroke="#0F172A" stroke-width="1.5"/><text x="70" y="42" text-anchor="middle" font-family="Inter,system-ui" font-weight="800" font-size="17" fill="#fff">landlords</text><text x="70" y="64" text-anchor="middle" font-family="Inter,system-ui" font-weight="500" font-size="12" fill="#CBD5E1">every holder, pro rata</text></g>
+      </svg>
+    </div>
     <div class="rule">
       <div><i>I.</i><span>Every coin is a property. It picks the stock it pays in.</span></div>
       <div><i>II.</i><span>Every trade pays rent: 1%.</span></div>
@@ -398,38 +393,7 @@ function keySVG(cls) {
   <rect x="44" y="50.5" width="16" height="3.7" rx="1.8" fill="${CORAL}"/></svg>`;
 }
 $('#footKey').outerHTML = keySVG('k');
-$('#lkey').innerHTML = keySVG('lkey').replace('viewBox="0 0 100 100"', 'viewBox="0 -60 100 160"').replace('<defs>', `<line x1="52" y1="-60" x2="52" y2="10" stroke="${NAVY}" stroke-width="2.5"/><defs>`);
-// loader: the bar advances as real work finishes; the log says what was read
-const LOAD = { n: 0, total: 4, done: false };
-function llog(t) { const d = document.createElement('div'); d.textContent = '› ' + t; $('#llog').appendChild(d); const L = $('#llog'); while (L.children.length > 5) L.removeChild(L.firstChild); }
-function drawLoaderStreet(progress) {
-  const c = $('#lstreet'); if (!c) return; const dpr = Math.min(2, devicePixelRatio || 1);
-  const W = c.clientWidth, H = c.clientHeight; c.width = W * dpr; c.height = H * dpr;
-  const g = c.getContext('2d'); g.scale(dpr, dpr); g.clearRect(0, 0, W, H);
-  // low sun + far row
-  const sg = g.createRadialGradient(W * .68, H * 1.05, 0, W * .68, H * 1.05, H * .98); sg.addColorStop(0, 'rgba(255,214,170,.75)'); sg.addColorStop(1, 'rgba(255,214,170,0)'); g.fillStyle = sg; g.fillRect(0, 0, W, H);
-  const rf = rng(7); g.fillStyle = 'rgba(120,118,170,.30)';
-  for (let x = -20; x < W + 20;) { const bw = 36 + rf() * 60, bh = H * (.4 + rf() * .5); g.fillRect(x, H - bh, bw, bh); x += bw + 6 + rf() * 12; }
-  const r = rng(21); let lit = 0, total = 0; const rw = rng(33);
-  for (let x = -10; x < W + 10;) {
-    const bw = 40 + r() * 70, bh = H * (.25 + r() * .6), top = H - bh; const k = r();
-    g.fillStyle = NAVY; g.fillRect(x, top, bw, bh);
-    if (k < .35) { g.beginPath(); g.moveTo(x - 4, top); g.lineTo(x + bw / 2, top - bw * .25); g.lineTo(x + bw + 4, top); g.fill(); }
-    else if (k < .6) g.fillRect(x - 3, top - 5, bw + 6, 5); else { g.fillRect(x + bw * .2, top - 9, bw * .6, 9); g.fillRect(x + bw * .4, top - 16, bw * .2, 7); }
-    const cols = Math.max(1, Math.floor((bw - 10) / 18)), rows = Math.max(1, Math.floor((bh - 22) / 20)); const ox = x + (bw - (cols * 18 - 7)) / 2;
-    for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) { const wy = top + 9 + j * 20; if (wy + 12 > H - 6) continue; total++; const on = rw() < progress; if (on) lit++; g.fillStyle = on ? (rw() > .8 ? CORAL : CREAM) : '#1E293B'; g.fillRect(ox + i * 18, wy, 11, 12); }
-    x += bw + 5 + r() * 16;
-  }
-  g.fillStyle = NAVY; g.fillRect(0, H - 2, W, 2);
-}
-function ltick(t) { LOAD.n++; if (t) llog(t); $('#lbar').style.width = Math.min(100, Math.round(LOAD.n / LOAD.total * 100)) + '%'; drawLoaderStreet(Math.min(1, LOAD.n / LOAD.total)); if (LOAD.n >= LOAD.total) lready(); }
-function lready() { if (LOAD.done) return; LOAD.done = true; $('#lbar').style.width = '100%'; drawLoaderStreet(1); llog('the street is open.'); $('#lenter').classList.add('ready'); }
-function enter() { const l = $('#loader'); if (!l) return; l.classList.add('out'); document.body.classList.remove('loading'); setTimeout(() => l.remove(), 650); drawStreet(PROPS.map(p => p.stock).filter(Boolean)); }
-$('#lenter').addEventListener('click', enter);
-addEventListener('keydown', e => { if (e.key === 'Enter' && LOAD.done && $('#loader')) enter(); });
-llog('signing the lease…'); drawLoaderStreet(0.06);
-(document.fonts ? document.fonts.ready : Promise.resolve()).then(() => ltick('type set: Inter 500 · 600 · 800'));
-setTimeout(lready, 9000); // never trap the visitor if a reader is slow
+const ltick = () => {}; // (loading screen removed)
 $('.keys').innerHTML = ['k1', 'k2', 'k3', 'k4'].map(c => keySVG(c).replace('<svg', '<svg style="overflow:visible"')).join('');
 // strings above the hanging keys
 document.querySelectorAll('.keys svg').forEach(s => { s.setAttribute('viewBox', '0 -60 100 160'); s.insertAdjacentHTML('afterbegin', `<line x1="52" y1="-60" x2="52" y2="10" stroke="${NAVY}" stroke-width="2.5"/>`); });
@@ -525,11 +489,13 @@ function propCard(p, live, preview) {
   const trade = p.pool || (p.ca ? `https://ponsfamily.com/launchpad/${p.ca}` : '');
   const chart = L.chart || (p.ca ? `https://dexscreener.com/robinhood/${p.ca}` : '');
   const holders = p.ca ? `https://robinhoodchain.blockscout.com/token/${p.ca}?tab=holders` : '';
-  return `<div class="sky">${buildingSVG(p.name || p.ticker || 'x', p.stock)}</div>
+  const maxCap = Math.max(0.0001, ...PROPS.map(q => (q.live && q.live.capRate) || 0));
+  return `<div class="sky ${preview ? '' : 'open'}" data-ca="${esc(p.ca || '')}">${buildingSVG(p.name || p.ticker || 'x', p.stock)}</div>
   <div class="body">
-    <div class="name"><b>${esc(p.name || 'Property')}</b><span class="chip navy">$${esc(p.ticker || '—')}</span></div>
+    <div class="name"><b class="${preview ? '' : 'open'}" data-ca="${esc(p.ca || '')}">${esc(p.name || 'Property')}</b><span class="chip navy">$${esc(p.ticker || '—')}</span></div>
     <div style="margin-top:8px"><span class="chip">pays in $${esc(p.stock || '—')}</span> ${p.listed ? `<span class="chip mute">listed ${esc(p.listed)}</span>` : ''}</div>
     <div class="cap"><b>${L.capRate != null ? fmtPct(L.capRate) : '—'}</b><span>cap rate${L.capRate == null && p.ca ? (L.dex === 'no pair yet' ? ' · no pair yet' : L.error ? ' · reader offline' : ' · reading…') : ''}</span></div>
+    <div class="capbar"><i style="width:${L.capRate ? Math.max(4, Math.round(L.capRate / maxCap * 100)) : 0}%"></i></div>
     <div class="stats">
       <div><span>rent / hr</span><b>${fmtUsd(L.rentPerHour)}</b></div>
       <div><span>tenants</span><b>${fmtN(L.holders)}</b></div>
@@ -557,6 +523,35 @@ function renderBoard() {
   const T = $('#total'); T.hidden = !live.length;
   T.innerHTML = `<span class="chip navy">${PROPS.length} propert${PROPS.length === 1 ? 'y' : 'ies'}</span><span class="chip">${fmtUsd(rent)} rent / hr</span><span class="chip mute">${fmtN(ten)} tenants</span><span class="chip mute">${fmtUsd(mc)} on the street</span>`;
 }
+// property sheet
+function openSheet(ca) {
+  const p = PROPS.find(q => q.ca === ca); if (!p) return; const L = p.live || {};
+  const trade = p.pool || `https://ponsfamily.com/launchpad/${p.ca}`, chart = L.chart || `https://dexscreener.com/robinhood/${p.ca}`, holders = `https://robinhoodchain.blockscout.com/token/${p.ca}?tab=holders`;
+  $('#sheetBody').innerHTML = `<div class="sky">${buildingSVG(p.name || p.ticker, p.stock)}</div><div class="body">
+    <div class="name"><h3>${esc(p.name)}</h3><span class="chip navy">$${esc(p.ticker)}</span></div>
+    <div style="margin-top:8px"><span class="chip">pays in $${esc(p.stock)}</span> ${p.listed ? `<span class="chip mute">listed ${esc(p.listed)}</span>` : ''} ${L.quote ? `<span class="chip mute">curve in ${esc(L.quote)}</span>` : ''}</div>
+    <div class="cap"><b>${fmtPct(L.capRate)}</b><span>cap rate · ${L.feeIncome24 != null ? fmtUsd(L.feeIncome24) + ' rent / day' : 'no pair yet'}</span></div>
+    <div class="kv">
+      <span>rent / hr</span><b>${fmtUsd(L.rentPerHour)}</b>
+      <span>tenants</span><b>${fmtN(L.holders)}</b>
+      <span>market cap</span><b>${fmtUsd(L.mcap)}</b>
+      <span>liquidity</span><b>${fmtUsd(L.liquidity)}</b>
+      <span>24h volume</span><b>${fmtUsd(L.volume24)}</b>
+      <span>price</span><b>${L.price ? '$' + L.price.toPrecision(4) : '—'}</b>
+      <span>24h</span><b>${L.change24 != null ? (L.change24 >= 0 ? '▲ ' : '▼ ') + Math.abs(L.change24).toFixed(2) + '%' : '—'}</b>
+      <span>rent wallet</span><b>${p.landlord ? esc(p.landlord) : '—'}</b>
+      <span>address</span><b>${esc(p.ca)} <button class="btn" style="padding:6px 10px;font-size:12px;margin-left:6px" type="button" onclick="copy('${esc(p.ca)}')">copy</button></b>
+    </div>
+    <div class="links"><a href="${trade}" target="_blank" rel="noopener">trade ↗</a><a href="${chart}" target="_blank" rel="noopener">chart ↗</a><a href="${holders}" target="_blank" rel="noopener">tenants ↗</a><a href="https://robinhoodchain.blockscout.com/token/${p.ca}" target="_blank" rel="noopener">explorer ↗</a></div>
+  </div>`;
+  $('#sheet').classList.add('show');
+}
+function closeSheet() { $('#sheet').classList.remove('show'); }
+$('#sheetX').addEventListener('click', closeSheet);
+$('#sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });
+addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+$('#board').addEventListener('click', e => { const t = e.target.closest('.open'); if (t && t.dataset.ca) openSheet(t.dataset.ca); });
+
 $('#sort').addEventListener('click', e => {
   const k = e.target.dataset.k; if (!k) return;
   if (k === 'refresh') { toast('Reading the chain…'); loadBoard(); return; }
@@ -657,10 +652,14 @@ $('#snd').addEventListener('click', () => sound(!SND));
 function tickClock() {
   const now = new Date(); const next = new Date(now); next.setMinutes(60, 0, 0);
   const left = Math.max(0, next - now); const m = Math.floor(left / 60000), sec = Math.floor(left / 1000) % 60;
-  $('#clock').textContent = String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+  const t = String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0'); $('#clock').textContent = t; $('#heroClock').textContent = t;
   $('#clockBar').style.width = (100 - left / 36000) + '%';
 }
 tickClock(); setInterval(tickClock, 1000);
+
+// nav: highlight the section in view
+const secIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) document.querySelectorAll('nav a').forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id.replace('-s', ''))); }), { rootMargin: '-40% 0px -55% 0px' });
+document.querySelectorAll('section[id]').forEach(sec => secIO.observe(sec));
 
 // reveal on scroll
 const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });

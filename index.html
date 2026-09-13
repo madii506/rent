@@ -3,16 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rent</title>
+<title>RENT</title>
 <meta name="description" content="Every coin is a property. Traders pay the rent. Holders are the landlords, paid every hour in the stock.">
 <meta property="og:title" content="Rent — every coin is a property">
 <meta property="og:description" content="Traders pay the rent. Holders are the landlords, paid every hour in the stock. Rent is due every hour.">
 <meta property="og:image" content="assets/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=1">
-<link rel="icon" type="image/png" sizes="64x64" href="assets/favicon-64.png?v=1">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png?v=1">
-<link rel="icon" type="image/png" sizes="512x512" href="assets/favicon-512.png?v=1">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=2">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=2">
+<link rel="icon" type="image/png" sizes="64x64" href="assets/favicon-64.png?v=2">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png?v=2">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/favicon-512.png?v=2">
 <script>
 // ------------------------------------------------------------------
 // CONFIG — fill at launch. Rows that need a value render only when set.
@@ -45,6 +46,27 @@ h2{font-size:clamp(30px,4.2vw,44px);line-height:1.05}
 .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
 section{padding:84px 0}
 section+section{border-top:1px solid var(--line)}
+
+/* loading screen — opaque, nav hidden, wordmark + key + bar + log + ENTER */
+body.loading{overflow:hidden}
+body.loading nav{display:none}
+#loader{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:
+ radial-gradient(60% 80% at 8% 30%,#FFBE96 0%,rgba(255,190,150,0) 60%),
+ radial-gradient(50% 70% at 50% 35%,#DECDFF 0%,rgba(222,205,255,0) 60%),
+ radial-gradient(60% 80% at 92% 30%,#A0D6FF 0%,rgba(160,214,255,0) 60%),#FAF7F1;transition:opacity .6s}
+#loader.out{opacity:0;pointer-events:none}
+#loader .lkey{width:120px;height:auto;overflow:visible;transform-origin:50% 0;animation:sway 4s ease-in-out infinite;filter:drop-shadow(0 14px 16px rgba(15,23,42,.2))}
+#loader .lword{font-size:clamp(64px,10vw,120px);line-height:.9;letter-spacing:-.05em;font-weight:800;margin-top:8px}
+#loader .ltag{font-weight:600;font-size:18px;margin:10px 0 26px}
+#loader .bar{width:min(420px,80vw);height:8px;border-radius:999px;background:rgba(15,23,42,.12);overflow:hidden}
+#loader .bar i{display:block;height:100%;width:0;background:var(--navy);border-radius:999px;transition:width .5s}
+#loader .log{margin:18px 0 0;height:116px;width:min(420px,80vw);text-align:left;font:500 13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#334155;overflow:hidden;white-space:pre-wrap}
+#loader .log div{opacity:0;animation:lin .4s forwards}
+@keyframes lin{to{opacity:1}}
+#loader .enter{margin-top:22px;opacity:0;pointer-events:none;transition:opacity .4s}
+#loader .enter.ready{opacity:1;pointer-events:auto;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@media(max-width:520px){#loader .log{height:120px}}
 
 /* nav — links only, centered, one row */
 nav{position:sticky;top:0;z-index:20;background:rgba(250,247,241,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
@@ -165,7 +187,16 @@ footer .k{width:36px;margin:0 auto 12px;display:block}
 .toast.show{opacity:1;transform:translateX(-50%)}
 </style>
 </head>
-<body>
+<body class="loading">
+
+<div id="loader" role="dialog" aria-label="loading">
+  <div id="lkey"></div>
+  <div class="lword">rent</div>
+  <div class="ltag">Rent is due every hour.</div>
+  <div class="bar"><i id="lbar"></i></div>
+  <div class="log" id="llog"></div>
+  <button class="btn fill enter" id="lenter" type="button">ENTER</button>
+</div>
 
 <nav><ul>
   <li><a href="#street">street</a></li>
@@ -338,6 +369,18 @@ function keySVG(cls) {
   <rect x="44" y="50.5" width="16" height="3.7" rx="1.8" fill="${CORAL}"/></svg>`;
 }
 $('#footKey').outerHTML = keySVG('k');
+$('#lkey').innerHTML = keySVG('lkey').replace('viewBox="0 0 100 100"', 'viewBox="0 -60 100 160"').replace('<defs>', `<line x1="52" y1="-60" x2="52" y2="10" stroke="${NAVY}" stroke-width="2.5"/><defs>`);
+// loader: the bar advances as real work finishes; the log says what was read
+const LOAD = { n: 0, total: 4, done: false };
+function llog(t) { const d = document.createElement('div'); d.textContent = '› ' + t; $('#llog').appendChild(d); const L = $('#llog'); while (L.children.length > 5) L.removeChild(L.firstChild); }
+function ltick(t) { LOAD.n++; if (t) llog(t); $('#lbar').style.width = Math.min(100, Math.round(LOAD.n / LOAD.total * 100)) + '%'; if (LOAD.n >= LOAD.total) lready(); }
+function lready() { if (LOAD.done) return; LOAD.done = true; $('#lbar').style.width = '100%'; llog('the street is open.'); $('#lenter').classList.add('ready'); }
+function enter() { const l = $('#loader'); if (!l) return; l.classList.add('out'); document.body.classList.remove('loading'); setTimeout(() => l.remove(), 650); drawStreet(PROPS.map(p => p.stock).filter(Boolean)); }
+$('#lenter').addEventListener('click', enter);
+addEventListener('keydown', e => { if (e.key === 'Enter' && LOAD.done && $('#loader')) enter(); });
+llog('signing the lease…');
+(document.fonts ? document.fonts.ready : Promise.resolve()).then(() => ltick('type set: Inter 500 · 600 · 800'));
+setTimeout(lready, 9000); // never trap the visitor if a reader is slow
 $('.keys').innerHTML = ['k1', 'k2', 'k3', 'k4'].map(c => keySVG(c).replace('<svg', '<svg style="overflow:visible"')).join('');
 // strings above the hanging keys
 document.querySelectorAll('.keys svg').forEach(s => { s.setAttribute('viewBox', '0 -60 100 160'); s.insertAdjacentHTML('afterbegin', `<line x1="52" y1="-60" x2="52" y2="10" stroke="${NAVY}" stroke-width="2.5"/>`); });
@@ -409,7 +452,8 @@ async function loadTape() {
     const items = (j.quotes || []).filter(q => q.price).map(q => `<span class="q">$${q.s} <span class="c">${q.price.toFixed(2)}</span> ${q.change == null ? '' : `<span class="${q.change >= 0 ? 'up' : 'dn'}">${q.change >= 0 ? '▲' : '▼'} ${(Math.abs(q.change) * 100).toFixed(2)}%</span>`}</span>`);
     if (!items.length) throw 0;
     $('#tapeRow').innerHTML = items.join('') + items.join('');
-  } catch (e) { $('#tapeRow').innerHTML = TAPE.map(s => `<span class="q">$${s} <span class="c">quote unavailable</span></span>`).join('').repeat(2); }
+    if (!loadTape.once) { loadTape.once = 1; ltick(`quotes: ${items.length} stocks read`); }
+  } catch (e) { $('#tapeRow').innerHTML = TAPE.map(s => `<span class="q">$${s} <span class="c">quote unavailable</span></span>`).join('').repeat(2); if (!loadTape.once) { loadTape.once = 1; ltick('quotes: reader unavailable'); } }
 }
 
 // ------------------------------------------------------------------ the street (board)
@@ -421,8 +465,10 @@ async function loadBoard() {
   PROPS = reg.map(p => ({ ...p, live: null }));
   renderBoard();
   drawStreet(PROPS.map(p => p.stock).filter(Boolean));
+  if (!loadBoard.once) { loadBoard.once = 1; ltick(`street: ${PROPS.length} propert${PROPS.length === 1 ? 'y' : 'ies'} listed`); }
   await Promise.all(PROPS.map(async p => { try { p.live = await (await fetch('/api/coin?ca=' + p.ca)).json(); } catch (e) { p.live = { error: true }; } }));
   renderBoard();
+  if (!loadBoard.twice) { loadBoard.twice = 1; ltick(PROPS.length ? `chain: ${PROPS.filter(p => p.live && !p.live.error).length} read from Blockscout + Dexscreener` : 'chain: nothing to read yet'); }
 }
 function propCard(p, live, preview) {
   const L = live || {};

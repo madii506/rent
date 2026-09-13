@@ -55,18 +55,20 @@ body.loading nav{display:none}
  radial-gradient(50% 70% at 50% 35%,#DECDFF 0%,rgba(222,205,255,0) 60%),
  radial-gradient(60% 80% at 92% 30%,#A0D6FF 0%,rgba(160,214,255,0) 60%),#FAF7F1;transition:opacity .6s}
 #loader.out{opacity:0;pointer-events:none}
-#loader .lkey{width:120px;height:auto;overflow:visible;transform-origin:50% 0;animation:sway 4s ease-in-out infinite;filter:drop-shadow(0 14px 16px rgba(15,23,42,.2))}
-#loader .lword{font-size:clamp(64px,10vw,120px);line-height:.9;letter-spacing:-.05em;font-weight:800;margin-top:8px}
+#loader .lkey{width:150px;height:auto;overflow:visible;transform-origin:50% 0;animation:sway 4s ease-in-out infinite;filter:drop-shadow(0 14px 16px rgba(15,23,42,.2))}
+#loader .lword{font-size:clamp(64px,10vw,120px);line-height:.9;letter-spacing:-.05em;font-weight:800;margin:6px 0 26px}
 #loader .ltag{font-weight:600;font-size:18px;margin:10px 0 26px}
 #loader .bar{width:min(420px,80vw);height:8px;border-radius:999px;background:rgba(15,23,42,.12);overflow:hidden}
-#loader .bar i{display:block;height:100%;width:0;background:var(--navy);border-radius:999px;transition:width .5s}
+#loader .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--navy) 0,var(--navy) calc(100% - 10px),var(--coral) calc(100% - 10px));border-radius:999px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
 #loader .log{margin:18px 0 0;height:116px;width:min(420px,80vw);text-align:left;font:500 13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#334155;overflow:hidden;white-space:pre-wrap}
 #loader .log div{opacity:0;animation:lin .4s forwards}
 @keyframes lin{to{opacity:1}}
 #loader .enter{margin-top:22px;opacity:0;pointer-events:none;transition:opacity .4s}
 #loader .enter.ready{opacity:1;pointer-events:auto;animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-@media(max-width:520px){#loader .log{height:120px}}
+#lstreet{position:absolute;left:0;right:0;bottom:0;width:100%;height:150px;pointer-events:none}
+#loader>*:not(#lstreet){position:relative;z-index:1}
+@media(max-width:520px){#loader .log{height:120px}#lstreet{height:90px}}
 
 /* nav — links only, centered, one row */
 nav{position:sticky;top:0;z-index:20;background:rgba(250,247,241,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
@@ -192,10 +194,10 @@ footer .k{width:36px;margin:0 auto 12px;display:block}
 <div id="loader" role="dialog" aria-label="loading">
   <div id="lkey"></div>
   <div class="lword">rent</div>
-  <div class="ltag">Rent is due every hour.</div>
   <div class="bar"><i id="lbar"></i></div>
   <div class="log" id="llog"></div>
   <button class="btn fill enter" id="lenter" type="button">ENTER</button>
+  <canvas id="lstreet" aria-hidden="true"></canvas>
 </div>
 
 <nav><ul>
@@ -373,12 +375,28 @@ $('#lkey').innerHTML = keySVG('lkey').replace('viewBox="0 0 100 100"', 'viewBox=
 // loader: the bar advances as real work finishes; the log says what was read
 const LOAD = { n: 0, total: 4, done: false };
 function llog(t) { const d = document.createElement('div'); d.textContent = '› ' + t; $('#llog').appendChild(d); const L = $('#llog'); while (L.children.length > 5) L.removeChild(L.firstChild); }
-function ltick(t) { LOAD.n++; if (t) llog(t); $('#lbar').style.width = Math.min(100, Math.round(LOAD.n / LOAD.total * 100)) + '%'; if (LOAD.n >= LOAD.total) lready(); }
-function lready() { if (LOAD.done) return; LOAD.done = true; $('#lbar').style.width = '100%'; llog('the street is open.'); $('#lenter').classList.add('ready'); }
+function drawLoaderStreet(progress) {
+  const c = $('#lstreet'); if (!c) return; const dpr = Math.min(2, devicePixelRatio || 1);
+  const W = c.clientWidth, H = c.clientHeight; c.width = W * dpr; c.height = H * dpr;
+  const g = c.getContext('2d'); g.scale(dpr, dpr); g.clearRect(0, 0, W, H);
+  const r = rng(21); let lit = 0, total = 0; const rw = rng(33);
+  for (let x = -10; x < W + 10;) {
+    const bw = 40 + r() * 70, bh = H * (.25 + r() * .6), top = H - bh; const k = r();
+    g.fillStyle = NAVY; g.fillRect(x, top, bw, bh);
+    if (k < .35) { g.beginPath(); g.moveTo(x - 4, top); g.lineTo(x + bw / 2, top - bw * .25); g.lineTo(x + bw + 4, top); g.fill(); }
+    else if (k < .6) g.fillRect(x - 3, top - 5, bw + 6, 5); else { g.fillRect(x + bw * .2, top - 9, bw * .6, 9); g.fillRect(x + bw * .4, top - 16, bw * .2, 7); }
+    const cols = Math.max(1, Math.floor((bw - 10) / 18)), rows = Math.max(1, Math.floor((bh - 22) / 20)); const ox = x + (bw - (cols * 18 - 7)) / 2;
+    for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) { const wy = top + 9 + j * 20; if (wy + 12 > H - 6) continue; total++; const on = rw() < progress; if (on) lit++; g.fillStyle = on ? (rw() > .8 ? CORAL : CREAM) : '#1E293B'; g.fillRect(ox + i * 18, wy, 11, 12); }
+    x += bw + 5 + r() * 16;
+  }
+  g.fillStyle = NAVY; g.fillRect(0, H - 2, W, 2);
+}
+function ltick(t) { LOAD.n++; if (t) llog(t); $('#lbar').style.width = Math.min(100, Math.round(LOAD.n / LOAD.total * 100)) + '%'; drawLoaderStreet(Math.min(1, LOAD.n / LOAD.total)); if (LOAD.n >= LOAD.total) lready(); }
+function lready() { if (LOAD.done) return; LOAD.done = true; $('#lbar').style.width = '100%'; drawLoaderStreet(1); llog('the street is open.'); $('#lenter').classList.add('ready'); }
 function enter() { const l = $('#loader'); if (!l) return; l.classList.add('out'); document.body.classList.remove('loading'); setTimeout(() => l.remove(), 650); drawStreet(PROPS.map(p => p.stock).filter(Boolean)); }
 $('#lenter').addEventListener('click', enter);
 addEventListener('keydown', e => { if (e.key === 'Enter' && LOAD.done && $('#loader')) enter(); });
-llog('signing the lease…');
+llog('signing the lease…'); drawLoaderStreet(0.06);
 (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => ltick('type set: Inter 500 · 600 · 800'));
 setTimeout(lready, 9000); // never trap the visitor if a reader is slow
 $('.keys').innerHTML = ['k1', 'k2', 'k3', 'k4'].map(c => keySVG(c).replace('<svg', '<svg style="overflow:visible"')).join('');
